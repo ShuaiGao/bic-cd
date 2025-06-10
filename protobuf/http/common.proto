@@ -1,0 +1,37 @@
+syntax = "proto3";
+package http;
+
+option go_package = "pkg/gen/api";
+
+// 空参数
+message CommonNil{
+}
+
+message ItemList{
+  repeated Item item_list = 1;
+}
+message Item{
+  int32 id = 1;
+  string label = 2;
+}
+
+message ItemStrList{
+  repeated ItemStr item_str_list = 1;
+}
+message ItemStr{
+  string id = 1;
+  string label = 2;
+}
+
+message TreeItem{
+  uint32 id = 1;
+  string label = 2;
+  repeated TreeItem children = 5;
+}
+
+message TreeStrItem{
+  string id = 1;
+  string label = 2;
+  repeated TreeStrItem children = 5;
+}
+

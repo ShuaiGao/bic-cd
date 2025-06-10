@@ -1,0 +1,23 @@
+syntax = "proto3";
+package http;
+option go_package = "pkg/gen/api";
+
+message RequestGetService{
+  uint32 page = 1;
+  uint32 page_size = 2;
+}
+
+message ServiceItem{
+  string name = 1;
+}
+
+message ResponseGetService{
+  uint32 page = 1;
+  uint32 page_size = 2;
+  uint32 total = 3;
+}
+
+service manager_service{
+  // @Summary: 获取服务列表 @url:/bic-cd/manager/v1/services/
+  rpc GetServices(RequestGetService) returns (ResponseGetService);
+}

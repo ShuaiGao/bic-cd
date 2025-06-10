@@ -1,0 +1,117 @@
+definitions:
+  api.RequestAuth:
+    properties:
+      password:
+        description: '@gotags: validate:"required"'
+        type: string
+      username:
+        description: '@gotags: validate:"required"'
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  api.ResponseAuth:
+    properties:
+      token:
+        description: token
+        type: string
+      token_refresh:
+        description: 刷新token
+        type: string
+      username:
+        description: 用户名
+        type: string
+    type: object
+  api.ResponseGetService:
+    properties:
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+    type: object
+  gen.Response:
+    properties:
+      code:
+        type: integer
+      data: {}
+      detail:
+        type: string
+    type: object
+host: bic-cd.farmergao.cn
+info:
+  contact:
+    email: boringmanman@qq.com
+    name: ZiJiaGao
+  title: BicCD api文档
+  version: "0.1"
+paths:
+  /bic-cd/admin/v1/auth/:
+    post:
+      parameters:
+      - description: body 参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.RequestAuth'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/gen.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/api.ResponseAuth'
+              type: object
+        "401":
+          description: header need Authorization data
+          schema:
+            type: string
+        "403":
+          description: no api permission or no obj permission
+          schema:
+            type: string
+      summary: 获取token
+      tags:
+      - Auth-Service
+  /bic-cd/manager/v1/services/:
+    get:
+      parameters:
+      - description: 参数无注释
+        in: query
+        name: page
+        type: integer
+      - description: 参数无注释
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/gen.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/api.ResponseGetService'
+              type: object
+        "401":
+          description: header need Authorization data
+          schema:
+            type: string
+        "403":
+          description: no api permission or no obj permission
+          schema:
+            type: string
+      summary: 获取服务列表
+      tags:
+      - Manager-Service
+swagger: "2.0"

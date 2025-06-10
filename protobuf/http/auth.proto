@@ -1,0 +1,22 @@
+syntax = "proto3";
+package http;
+option go_package = "pkg/gen/api";
+
+// 获取授权token
+message RequestAuth{
+  // @gotags: validate:"required"
+  string username = 1; // 用户名
+  // @gotags: validate:"required"
+  string password = 2; // 密码
+}
+
+message ResponseAuth{
+  string token = 1; // token
+  string token_refresh = 2; // 刷新token
+  string username = 3; // 用户名
+}
+
+service auth_service{
+  // @Summary: 获取token @url:/bic-cd/admin/v1/auth/
+  rpc PostAuth(RequestAuth) returns (ResponseAuth);
+}

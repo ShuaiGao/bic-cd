@@ -1,0 +1,12 @@
+[Unit]
+Description=hello world
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=echo "hello world"
+WorkingDirectory=/home/hello
+User=root
+
+[Install]
+WantedBy=multi-user.target

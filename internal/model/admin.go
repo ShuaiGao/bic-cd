@@ -4,16 +4,17 @@ import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
-	Name         string   `gorm:"size:255;comment:姓名"`
-	Username     string   `gorm:"size:56;unique;index;comment:用户名"`
-	Phone        string   `gorm:"size:32;comment:电话号码"`
-	Email        string   `gorm:"size:56;comment:邮箱"`
-	Password     string   `gorm:"size:64;comment:密码"`
-	Avatar       string   `gorm:"comment:用户头像url"`
-	Groups       []*Group `gorm:"many2many:user_group;comment:用户关联权限组"`
-	Forbidden    bool     `gorm:"comment:是否禁用"`
-	UpdateUserID uint     `gorm:"comment:修改用户外键ID;default:null;"`
-	UpdateUser   *User    `gorm:"default:galeone;constraint:OnUpdate:SET NULL,OnDelete:SET NULL;"`
+	Name         string `gorm:"size:255;comment:姓名"`
+	Username     string `gorm:"size:56;unique;index;comment:用户名"`
+	Phone        string `gorm:"size:32;comment:电话号码"`
+	Email        string `gorm:"size:56;comment:邮箱"`
+	Password     string `gorm:"size:64;comment:密码"`
+	Salt         string `gorm:"size:64;comment:盐"`
+	Avatar       string `gorm:"comment:用户头像url"`
+	Forbidden    bool   `gorm:"comment:是否禁用"`
+	UpdateUserID uint   `gorm:"comment:修改用户外键ID;default:null;"`
+	UpdateUser   *User  `gorm:"default:galeone;constraint:OnUpdate:SET NULL,OnDelete:SET NULL;"`
+	//Groups       []*Group `gorm:"many2many:user_group;comment:用户关联权限组"`
 }
 
 type Group struct {

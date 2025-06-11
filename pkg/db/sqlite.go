@@ -6,6 +6,8 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"os"
+	"path/filepath"
 )
 
 var db *gorm.DB
@@ -21,6 +23,13 @@ func WithContext(ctx context.Context) *gorm.DB {
 func Setup() {
 	// 连接数据库，若数据库不存在则会自动创建
 	sqlitePath := config.GlobalConf.App.SqlitePath
+	// 获取文件的目录路径
+	dir := filepath.Dir(sqlitePath)
+	// 创建所有必要的目录（包括中间目录）
+	// 0755 是目录权限：所有者可读可写可执行，组和其他可读可执行
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		panic("创建目录失败: " + err.Error())
+	}
 	var err error
 	db, err = gorm.Open(sqlite.Open(sqlitePath), &gorm.Config{
 		Logger:          logger.Default.LogMode(logger.Warn),

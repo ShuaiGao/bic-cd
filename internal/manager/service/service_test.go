@@ -1,11 +1,14 @@
 package service
 
-import "testing"
+import (
+	"bic-cd/internal/model"
+	"testing"
+)
 
 func Test_createServiceFile(t *testing.T) {
 	type args struct {
 		path   string
-		config ServiceConfig
+		config Config
 	}
 	tests := []struct {
 		name    string
@@ -14,12 +17,14 @@ func Test_createServiceFile(t *testing.T) {
 	}{
 		{name: "hello", args: args{
 			path: "hello.service",
-			config: ServiceConfig{
-				Name:        "hello",
-				Description: "hello world",
-				ExecStart:   "echo \"hello world\"",
-				WorkingDir:  "/home/hello",
-				User:        "root",
+			config: Config{
+				Service: model.Service{
+					Name:        "hello",
+					Description: "hello world",
+					ExecStart:   "echo \"hello world\"",
+					WorkingDir:  "/home/hello",
+					User:        "root",
+				},
 			},
 		}},
 	}

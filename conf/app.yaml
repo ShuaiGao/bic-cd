@@ -1,7 +1,5 @@
 app:
   jwt_secret: "aabb"
-  log_save_path: "run/logs/"
-
-server:
+  log_path: "run/logs/bic-cd.log"
+  sqlite_path: "run/db/bic-cd.db"
   run_mode: "debug"
-  http_port: 7788

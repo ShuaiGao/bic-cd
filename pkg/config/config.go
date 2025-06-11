@@ -9,52 +9,24 @@ import (
 var AppSetting *App
 
 type App struct {
-	JwtSecret     string `yaml:"jwtSecret"`
-	LogSavePath   string `yaml:"log_save_path"`
+	JwtSecret     string `yaml:"jwt_secret"`
+	LogPath       string `yaml:"log_path"`
 	FileCachePath string `yaml:"file_cache_path"`
-	DomainServer  string `yaml:"domain_server"`
-	DomainClient  string `yaml:"domain_client"`
 	SuperUsername string `yaml:"super_username"`
 	DingWebHook   string `yaml:"ding_web_hook"`
 	DingSecret    string `yaml:"ding_secret"`
-	MailHost      string `yaml:"mail_host"`
-	MailAddress   string `yaml:"mail_address"`
-	MailPassword  string `yaml:"mail_password"`
 	ApiKey        string `yaml:"api_key"`
 	SqlitePath    string `yaml:"sqlite_path"`
-}
-
-var RedisSetting *RedisConfig
-
-type RedisConfig struct {
-	Addr              string `yaml:"addr"`
-	Password          string `yaml:"password"`
-	DBIndex           int    `yaml:"db_index"`
-	MaxIdle           int    `yaml:"max_idle"`
-	MaxActive         int    `yaml:"max_active"`
-	IdleTimeoutSecond int    `yaml:"idle_timeout"`
-}
-
-var ServerSetting *Server
-
-type Server struct {
-	TaskSwitch         string `yaml:"task_switch"`
-	RunMode            string `yaml:"run_mode"`
-	HttpPort           int    `yaml:"http_port"`
-	ReadTimeoutSecond  int64  `yaml:"read_timeout"`
-	WriteTimeoutSecond int64  `yaml:"write_timeout"`
+	RunMode       string `yaml:"run_mode"`
 }
 
 var GlobalConf = &Config{}
 
 type Config struct {
-	App    App         `yaml:"app"`
-	Server Server      `yaml:"server" `
-	Redis  RedisConfig `yaml:"redis" `
+	App App `yaml:"app"`
 }
 
-func SetupYaml() {
-	cfgPath := "conf/app.yaml"
+func SetupYaml(cfgPath string) {
 	if f, err := os.Open(cfgPath); err != nil {
 		panic(err)
 	} else {
@@ -63,8 +35,5 @@ func SetupYaml() {
 	if GlobalConf.App.JwtSecret == "" {
 		panic("配置文件初始化失败")
 	}
-
 	AppSetting = &GlobalConf.App
-	ServerSetting = &GlobalConf.Server
-	RedisSetting = &GlobalConf.Redis
 }

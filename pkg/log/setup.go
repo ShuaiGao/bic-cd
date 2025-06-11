@@ -7,7 +7,6 @@ import (
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"os"
-	"path"
 )
 
 type zapLogger struct {
@@ -19,6 +18,10 @@ var (
 	logger        *zapLogger
 	extraCtxField = []string{TraceKey, TraceTimestamp}
 )
+
+func Stop() {
+	logger.logger.Sync()
+}
 
 func Setup() {
 	Console := &consoleConfig{
@@ -33,7 +36,7 @@ func Setup() {
 			Level:        zapcore.InfoLevel,
 		},
 		Logger: lumberjack.Logger{
-			Filename:   path.Join(config.AppSetting.LogSavePath, "bic-cd.log"),
+			Filename:   config.AppSetting.LogPath,
 			MaxSize:    32,
 			MaxBackups: 10,
 			MaxAge:     30,

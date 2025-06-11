@@ -2,6 +2,7 @@ package internal
 
 import (
 	"bic-cd/internal/admin"
+	"bic-cd/pkg/config"
 	"bic-cd/pkg/gen/api"
 	"bic-cd/pkg/gin_recover"
 	"bic-cd/pkg/log"
@@ -26,30 +27,20 @@ func Cors() gin.HandlerFunc {
 	}
 }
 
-var ginInstance *gin.Engine
-
-func Setup() {
-	ginInstance = gin.New()
-	ginInstance.ContextWithFallback = true
-	ginInstance.Use(gin_recover.Recovery())
-	ginInstance.Use(log.MidLogger())
-	ginInstance.Use(Cors())
-	ginInstance.GET("/health/", func(ctx *gin.Context) {
+func Setup() *gin.Engine {
+	gin.SetMode(config.GlobalConf.App.RunMode)
+	g := gin.New()
+	g.Use(gin_recover.Recovery())
+	g.Use(log.MidLogger())
+	g.Use(Cors())
+	g.GET("/health", func(ctx *gin.Context) {
 		ctx.JSON(200, "success")
 	})
-	ginInstance.GET("/health", func(ctx *gin.Context) {
-		ctx.JSON(200, "success")
-	})
-}
-
-// SetupRouter 启动路由，添加中间件
-func SetupRouter() *gin.Engine {
-	g := ginInstance
-	apiNoJwt := g.Group("")
-	api.RegisterAuthServiceHttpHandler(apiNoJwt, admin.Auth{})
 	if gin.IsDebugging() {
 		g.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
+	apiNoJwt := g.Group("")
+	api.RegisterAuthServiceHttpHandler(apiNoJwt, admin.Auth{})
 	//注册、设置路由
 	return g
 }

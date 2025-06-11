@@ -8,6 +8,10 @@ import (
 
 var jwtSecret []byte
 
+func SetSecret(secret []byte) {
+	jwtSecret = secret
+}
+
 type Claims struct {
 	UserId   uint   `json:"user_id"`
 	Username string `json:"username"`

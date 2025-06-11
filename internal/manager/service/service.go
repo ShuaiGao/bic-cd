@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bic-cd/internal/model"
 	"os"
 	"text/template"
 )
@@ -26,21 +27,18 @@ User={{.User}}
 WantedBy=multi-user.target
 `))
 
-type ServiceConfig struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	ExecStart   string `json:"exec_start"`
-	WorkingDir  string `json:"working_dir,omitempty"`
-	User        string `json:"user,omitempty"`
+type Config struct {
+	Service  model.Service
+	Instance model.ServiceInstance
 }
 
 // 使用模板生成systemd服务文件
-func createServiceFile(path string, config ServiceConfig) error {
+func createServiceFile(path string, config Config) error {
 	file, err := os.Create(path)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
 
-	return systemdServiceTemplate.Execute(file, config)
+	return systemdServiceTemplate.Execute(file, config.Service)
 }

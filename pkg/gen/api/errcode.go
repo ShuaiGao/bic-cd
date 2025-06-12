@@ -72,7 +72,4 @@ var (
 	ECDbCountError          = Err{code: 102008, msg: "数据库count错误"}
 	ECDbExecError           = Err{code: 102009, msg: "sql执行错误"}
 	ECParamValidatorError   = Err{code: 102200, msg: "参数校验错误"}
-	ECCasbinDeleteError     = Err{code: 102201, msg: "casbin移除权限错误"}
-	ECCasbinFilterError     = Err{code: 102202, msg: "casbin查询出错"}
-	ECCasbinAddError        = Err{code: 102203, msg: "casbin添加权限出错"}
 )

@@ -7,6 +7,7 @@ package api
 // is compatible with the kratos package it is being compiled against.
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -17,15 +18,21 @@ var ManagerServiceValidate = validator.New()
 func RegisterManagerServiceHttpHandler(g *gin.RouterGroup, srvs ManagerService) {
 	tmp := &x_ManagerService{xx: srvs}
 	g.GET("/bic-cd/manager/v1/services/", tmp.GetServices)
+	g.POST("/bic-cd/manager/v1/services/", tmp.PostServices)
+	g.POST("/bic-cd/manager/v1/service/:id/deploy", tmp.PostServiceDeploy)
 }
 
 type ManagerService interface {
 	GetServices(ctx *gin.Context, in *RequestGetService) (out *ResponseGetService, code ErrCode)
+	PostServices(ctx *gin.Context, in *RequestPostService) (out *ResponsePostService, code ErrCode)
+	PostServiceDeploy(ctx *gin.Context, in *RequestPostService, id uint) (out *ResponsePostService, code ErrCode)
 }
 
 // generated http handle
 type ManagerServiceHttpHandler interface {
 	GetServices(ctx *gin.Context)
+	PostServices(ctx *gin.Context)
+	PostServiceDeploy(ctx *gin.Context)
 }
 
 type x_ManagerService struct {
@@ -59,6 +66,83 @@ func (x *x_ManagerService) GetServices(ctx *gin.Context) {
 		return
 	}
 	rsp, errCode := x.xx.GetServices(ctx, req)
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":   errCode.Code(),
+		"detail": errCode.String(),
+		"data":   rsp,
+	})
+}
+
+// @Summary	添加服务
+// @Tags		Manager-Service
+// @Produce	json
+// @Param		data	body		RequestPostService	true	"body 参数"
+// @Success	200		{object}	gen.Response{data=ResponsePostService}
+// @Failure	401		{string}	string	"header need Authorization data"
+// @Failure	403		{string}	string	"no api permission or no obj permission"
+// @Router		/bic-cd/manager/v1/services/ [POST]
+func (x *x_ManagerService) PostServices(ctx *gin.Context) {
+	req := &RequestPostService{}
+	if err := ctx.ShouldBindJSON(req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"code": 400, "detail": "request error"})
+		return
+	}
+	if err := ManagerServiceValidate.Struct(req); err != nil {
+		msg := "request param validator error"
+		if gin.Mode() == gin.DebugMode {
+			msg = msg + " | " + err.Error()
+		}
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":   400,
+			"detail": msg,
+		})
+		return
+	}
+	rsp, errCode := x.xx.PostServices(ctx, req)
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":   errCode.Code(),
+		"detail": errCode.String(),
+		"data":   rsp,
+	})
+}
+
+// @Summary	部署服务
+// @Tags		Manager-Service
+// @Produce	json
+// @Param		id		path		uint				true	"some id"
+// @Param		data	body		RequestPostService	true	"body 参数"
+// @Success	200		{object}	gen.Response{data=ResponsePostService}
+// @Failure	401		{string}	string	"header need Authorization data"
+// @Failure	403		{string}	string	"no api permission or no obj permission"
+// @Router		/bic-cd/manager/v1/service/:id/deploy [POST]
+func (x *x_ManagerService) PostServiceDeploy(ctx *gin.Context) {
+	req := &RequestPostService{}
+	if err := ctx.ShouldBindJSON(req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"code": 400, "detail": "request error"})
+		return
+	}
+	if err := ManagerServiceValidate.Struct(req); err != nil {
+		msg := "request param validator error"
+		if gin.Mode() == gin.DebugMode {
+			msg = msg + " | " + err.Error()
+		}
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":   400,
+			"detail": msg,
+		})
+		return
+	}
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil || id < 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":   400,
+			"detail": "param id should be int",
+		})
+		return
+	}
+	rsp, errCode := x.xx.PostServiceDeploy(ctx, req, uint(id))
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"code":   errCode.Code(),

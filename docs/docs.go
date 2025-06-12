@@ -18,6 +18,60 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/bic-cd/admin/v1/admin/": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth-Service"
+                ],
+                "summary": "创建管理员",
+                "parameters": [
+                    {
+                        "description": "body 参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RequestPostAdmin"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/gen.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/api.ResponsePostAdmin"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "header need Authorization data",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "no api permission or no obj permission",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/bic-cd/admin/v1/auth/": {
             "post": {
                 "produces": [
@@ -51,6 +105,67 @@ const docTemplate = `{
                                     "properties": {
                                         "data": {
                                             "$ref": "#/definitions/api.ResponseAuth"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "header need Authorization data",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "no api permission or no obj permission",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/bic-cd/manager/v1/service/:id/deploy": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Manager-Service"
+                ],
+                "summary": "部署服务",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "some id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "body 参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RequestPostService"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/gen.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/api.ResponsePostService"
                                         }
                                     }
                                 }
@@ -127,6 +242,58 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Manager-Service"
+                ],
+                "summary": "添加服务",
+                "parameters": [
+                    {
+                        "description": "body 参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RequestPostService"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/gen.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/api.ResponsePostService"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "header need Authorization data",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "no api permission or no obj permission",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
             }
         }
     },
@@ -144,6 +311,56 @@ const docTemplate = `{
                 },
                 "username": {
                     "description": "@gotags: validate:\"required\"",
+                    "type": "string"
+                }
+            }
+        },
+        "api.RequestPostAdmin": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "description": "密码",
+                    "type": "string"
+                },
+                "username": {
+                    "description": "账号",
+                    "type": "string"
+                }
+            }
+        },
+        "api.RequestPostService": {
+            "type": "object",
+            "properties": {
+                "config": {
+                    "description": "配置文件",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "服务描述",
+                    "type": "string"
+                },
+                "exec_start": {
+                    "description": "启动命令",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "服务名",
+                    "type": "string"
+                },
+                "port_max": {
+                    "description": "最大端口号",
+                    "type": "integer"
+                },
+                "port_min": {
+                    "description": "最小端口号",
+                    "type": "integer"
+                },
+                "user": {
+                    "description": "运行用户",
+                    "type": "string"
+                },
+                "working_dir": {
+                    "description": "工作目录",
                     "type": "string"
                 }
             }
@@ -168,6 +385,12 @@ const docTemplate = `{
         "api.ResponseGetService": {
             "type": "object",
             "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.ServiceItem"
+                    }
+                },
                 "page": {
                     "type": "integer"
                 },
@@ -176,6 +399,58 @@ const docTemplate = `{
                 },
                 "total": {
                     "type": "integer"
+                }
+            }
+        },
+        "api.ResponsePostAdmin": {
+            "type": "object"
+        },
+        "api.ResponsePostService": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "api.ServiceItem": {
+            "type": "object",
+            "properties": {
+                "config": {
+                    "description": "配置文件",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "服务描述",
+                    "type": "string"
+                },
+                "exec_start": {
+                    "description": "启动命令",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "id",
+                    "type": "integer"
+                },
+                "name": {
+                    "description": "服务名",
+                    "type": "string"
+                },
+                "port_max": {
+                    "description": "最大端口号",
+                    "type": "integer"
+                },
+                "port_min": {
+                    "description": "最小端口号",
+                    "type": "integer"
+                },
+                "user": {
+                    "description": "运行用户",
+                    "type": "string"
+                },
+                "working_dir": {
+                    "description": "工作目录",
+                    "type": "string"
                 }
             }
         },

@@ -1,6 +1,8 @@
 package util
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"regexp"
 	"time"
 )
@@ -24,4 +26,12 @@ var reTag = regexp.MustCompile(`^v\d+\.\d+\.\d+$`)
 
 func IsValidTag(tag string) bool {
 	return reTag.Match([]byte(tag))
+}
+
+// MD5 md5 encryption， 长度32的md5字符串
+func MD5(value string) string {
+	m := md5.New()
+	m.Write([]byte(value))
+
+	return hex.EncodeToString(m.Sum(nil))
 }

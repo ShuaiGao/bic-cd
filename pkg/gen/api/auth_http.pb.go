@@ -17,15 +17,18 @@ var AuthServiceValidate = validator.New()
 func RegisterAuthServiceHttpHandler(g *gin.RouterGroup, srvs AuthService) {
 	tmp := &x_AuthService{xx: srvs}
 	g.POST("/bic-cd/admin/v1/auth/", tmp.PostAuth)
+	g.POST("/bic-cd/admin/v1/admin/", tmp.PostAdmin)
 }
 
 type AuthService interface {
 	PostAuth(ctx *gin.Context, in *RequestAuth) (out *ResponseAuth, code ErrCode)
+	PostAdmin(ctx *gin.Context, in *RequestPostAdmin) (out *ResponsePostAdmin, code ErrCode)
 }
 
 // generated http handle
 type AuthServiceHttpHandler interface {
 	PostAuth(ctx *gin.Context)
+	PostAdmin(ctx *gin.Context)
 }
 
 type x_AuthService struct {
@@ -58,6 +61,40 @@ func (x *x_AuthService) PostAuth(ctx *gin.Context) {
 		return
 	}
 	rsp, errCode := x.xx.PostAuth(ctx, req)
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":   errCode.Code(),
+		"detail": errCode.String(),
+		"data":   rsp,
+	})
+}
+
+// @Summary	创建管理员
+// @Tags		Auth-Service
+// @Produce	json
+// @Param		data	body		RequestPostAdmin	true	"body 参数"
+// @Success	200		{object}	gen.Response{data=ResponsePostAdmin}
+// @Failure	401		{string}	string	"header need Authorization data"
+// @Failure	403		{string}	string	"no api permission or no obj permission"
+// @Router		/bic-cd/admin/v1/admin/ [POST]
+func (x *x_AuthService) PostAdmin(ctx *gin.Context) {
+	req := &RequestPostAdmin{}
+	if err := ctx.ShouldBindJSON(req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"code": 400, "detail": "request error"})
+		return
+	}
+	if err := AuthServiceValidate.Struct(req); err != nil {
+		msg := "request param validator error"
+		if gin.Mode() == gin.DebugMode {
+			msg = msg + " | " + err.Error()
+		}
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":   400,
+			"detail": msg,
+		})
+		return
+	}
+	rsp, errCode := x.xx.PostAdmin(ctx, req)
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"code":   errCode.Code(),

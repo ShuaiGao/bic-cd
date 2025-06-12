@@ -1,6 +1,11 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"bic-cd/internal/util"
+	"fmt"
+	"github.com/rs/xid"
+	"gorm.io/gorm"
+)
 
 type User struct {
 	gorm.Model
@@ -15,6 +20,15 @@ type User struct {
 	UpdateUserID uint   `gorm:"comment:修改用户外键ID;default:null;"`
 	UpdateUser   *User  `gorm:"default:galeone;constraint:OnUpdate:SET NULL,OnDelete:SET NULL;"`
 	//Groups       []*Group `gorm:"many2many:user_group;comment:用户关联权限组"`
+}
+
+func (u *User) SetPassword(password string) {
+	salt := xid.New().String() // create a new x-trace-id
+	u.Password = util.MD5(fmt.Sprintf("%s-%s", password, salt))
+}
+
+func (u *User) CheckPassword(password string) bool {
+	return u.Password == util.MD5(fmt.Sprintf("%s-%s", password, u.Salt))
 }
 
 type Group struct {

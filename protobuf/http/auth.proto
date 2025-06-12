@@ -16,7 +16,18 @@ message ResponseAuth{
   string username = 3; // 用户名
 }
 
+message RequestPostAdmin{
+  string username = 1; // 账号
+  string password = 2; // 密码
+}
+
+message ResponsePostAdmin{
+
+}
+
 service auth_service{
   // @Summary: 获取token @url:/bic-cd/admin/v1/auth/
   rpc PostAuth(RequestAuth) returns (ResponseAuth);
+  // @Summary: 创建管理员 @url:/bic-cd/admin/v1/admin/
+  rpc PostAdmin(RequestPostAdmin) returns (ResponsePostAdmin);
 }

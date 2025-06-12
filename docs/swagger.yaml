@@ -11,6 +11,42 @@ definitions:
     - password
     - username
     type: object
+  api.RequestPostAdmin:
+    properties:
+      password:
+        description: 密码
+        type: string
+      username:
+        description: 账号
+        type: string
+    type: object
+  api.RequestPostService:
+    properties:
+      config:
+        description: 配置文件
+        type: string
+      description:
+        description: 服务描述
+        type: string
+      exec_start:
+        description: 启动命令
+        type: string
+      name:
+        description: 服务名
+        type: string
+      port_max:
+        description: 最大端口号
+        type: integer
+      port_min:
+        description: 最小端口号
+        type: integer
+      user:
+        description: 运行用户
+        type: string
+      working_dir:
+        description: 工作目录
+        type: string
+    type: object
   api.ResponseAuth:
     properties:
       token:
@@ -25,12 +61,53 @@ definitions:
     type: object
   api.ResponseGetService:
     properties:
+      items:
+        items:
+          $ref: '#/definitions/api.ServiceItem'
+        type: array
       page:
         type: integer
       page_size:
         type: integer
       total:
         type: integer
+    type: object
+  api.ResponsePostAdmin:
+    type: object
+  api.ResponsePostService:
+    properties:
+      id:
+        type: integer
+    type: object
+  api.ServiceItem:
+    properties:
+      config:
+        description: 配置文件
+        type: string
+      description:
+        description: 服务描述
+        type: string
+      exec_start:
+        description: 启动命令
+        type: string
+      id:
+        description: id
+        type: integer
+      name:
+        description: 服务名
+        type: string
+      port_max:
+        description: 最大端口号
+        type: integer
+      port_min:
+        description: 最小端口号
+        type: integer
+      user:
+        description: 运行用户
+        type: string
+      working_dir:
+        description: 工作目录
+        type: string
     type: object
   gen.Response:
     properties:
@@ -48,6 +125,38 @@ info:
   title: BicCD api文档
   version: "0.1"
 paths:
+  /bic-cd/admin/v1/admin/:
+    post:
+      parameters:
+      - description: body 参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.RequestPostAdmin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/gen.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/api.ResponsePostAdmin'
+              type: object
+        "401":
+          description: header need Authorization data
+          schema:
+            type: string
+        "403":
+          description: no api permission or no obj permission
+          schema:
+            type: string
+      summary: 创建管理员
+      tags:
+      - Auth-Service
   /bic-cd/admin/v1/auth/:
     post:
       parameters:
@@ -80,6 +189,43 @@ paths:
       summary: 获取token
       tags:
       - Auth-Service
+  /bic-cd/manager/v1/service/:id/deploy:
+    post:
+      parameters:
+      - description: some id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: body 参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.RequestPostService'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/gen.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/api.ResponsePostService'
+              type: object
+        "401":
+          description: header need Authorization data
+          schema:
+            type: string
+        "403":
+          description: no api permission or no obj permission
+          schema:
+            type: string
+      summary: 部署服务
+      tags:
+      - Manager-Service
   /bic-cd/manager/v1/services/:
     get:
       parameters:
@@ -112,6 +258,37 @@ paths:
           schema:
             type: string
       summary: 获取服务列表
+      tags:
+      - Manager-Service
+    post:
+      parameters:
+      - description: body 参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.RequestPostService'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/gen.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/api.ResponsePostService'
+              type: object
+        "401":
+          description: header need Authorization data
+          schema:
+            type: string
+        "403":
+          description: no api permission or no obj permission
+          schema:
+            type: string
+      summary: 添加服务
       tags:
       - Manager-Service
 swagger: "2.0"

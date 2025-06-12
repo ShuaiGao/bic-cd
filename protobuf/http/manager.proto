@@ -8,16 +8,44 @@ message RequestGetService{
 }
 
 message ServiceItem{
-  string name = 1;
+  uint32 id = 1; // id
+  string name = 2; // 服务名
+  string description = 3; // 服务描述
+  string exec_start = 4; // 启动命令
+  string working_dir = 5;// 工作目录
+  string user = 6;// 运行用户
+  int32 port_min = 7;// 最小端口号
+  int32 port_max = 8;// 最大端口号
+  string config = 9;// 配置文件
 }
 
 message ResponseGetService{
   uint32 page = 1;
   uint32 page_size = 2;
   uint32 total = 3;
+  repeated ServiceItem items = 4;
+}
+
+message RequestPostService{
+  string name = 1; // 服务名
+  string description = 2; // 服务描述
+  string exec_start = 3; // 启动命令
+  string working_dir = 4;// 工作目录
+  string user = 5;// 运行用户
+  int32 port_min = 6;// 最小端口号
+  int32 port_max = 7;// 最大端口号
+  string config = 8;// 配置文件
+}
+
+message ResponsePostService{
+  uint32 id = 1;
 }
 
 service manager_service{
   // @Summary: 获取服务列表 @url:/bic-cd/manager/v1/services/
   rpc GetServices(RequestGetService) returns (ResponseGetService);
+  // @Summary: 添加服务 @url:/bic-cd/manager/v1/services/
+  rpc PostServices(RequestPostService) returns (ResponsePostService);
+  // @Summary: 部署服务 @url:/bic-cd/manager/v1/service/<uint:id>/deploy
+  rpc PostServiceDeploy(RequestPostService) returns (ResponsePostService);
 }

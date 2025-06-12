@@ -25,7 +25,7 @@ func RegisterManagerServiceHttpHandler(g *gin.RouterGroup, srvs ManagerService) 
 type ManagerService interface {
 	GetServices(ctx *gin.Context, in *RequestGetService) (out *ResponseGetService, code ErrCode)
 	PostServices(ctx *gin.Context, in *RequestPostService) (out *ResponsePostService, code ErrCode)
-	PostServiceDeploy(ctx *gin.Context, in *RequestPostService, id uint) (out *ResponsePostService, code ErrCode)
+	PostServiceDeploy(ctx *gin.Context, id uint) (out *ResponsePostServiceDeploy, code ErrCode)
 }
 
 // generated http handle
@@ -111,29 +111,13 @@ func (x *x_ManagerService) PostServices(ctx *gin.Context) {
 // @Summary	部署服务
 // @Tags		Manager-Service
 // @Produce	json
-// @Param		id		path		uint				true	"some id"
-// @Param		data	body		RequestPostService	true	"body 参数"
-// @Success	200		{object}	gen.Response{data=ResponsePostService}
+// @Param		id		path		uint		true	"some id"
+// @Param		data	body		CommonNil	true	"body 参数"
+// @Success	200		{object}	gen.Response{data=ResponsePostServiceDeploy}
 // @Failure	401		{string}	string	"header need Authorization data"
 // @Failure	403		{string}	string	"no api permission or no obj permission"
 // @Router		/bic-cd/manager/v1/service/:id/deploy [POST]
 func (x *x_ManagerService) PostServiceDeploy(ctx *gin.Context) {
-	req := &RequestPostService{}
-	if err := ctx.ShouldBindJSON(req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"code": 400, "detail": "request error"})
-		return
-	}
-	if err := ManagerServiceValidate.Struct(req); err != nil {
-		msg := "request param validator error"
-		if gin.Mode() == gin.DebugMode {
-			msg = msg + " | " + err.Error()
-		}
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"code":   400,
-			"detail": msg,
-		})
-		return
-	}
 	id, err := strconv.Atoi(ctx.Param("id"))
 	if err != nil || id < 0 {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -142,7 +126,7 @@ func (x *x_ManagerService) PostServiceDeploy(ctx *gin.Context) {
 		})
 		return
 	}
-	rsp, errCode := x.xx.PostServiceDeploy(ctx, req, uint(id))
+	rsp, errCode := x.xx.PostServiceDeploy(ctx, uint(id))
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"code":   errCode.Code(),

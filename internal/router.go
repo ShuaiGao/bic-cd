@@ -2,6 +2,7 @@ package internal
 
 import (
 	"bic-cd/internal/admin"
+	"bic-cd/internal/manager"
 	"bic-cd/pkg/config"
 	"bic-cd/pkg/gen/api"
 	"bic-cd/pkg/gin_recover"
@@ -41,6 +42,7 @@ func Setup() *gin.Engine {
 	}
 	apiNoJwt := g.Group("")
 	api.RegisterAuthServiceHttpHandler(apiNoJwt, admin.Auth{})
+	api.RegisterManagerServiceHttpHandler(apiNoJwt, manager.Manager{})
 	//注册、设置路由
 	return g
 }

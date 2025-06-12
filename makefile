@@ -1,4 +1,4 @@
-PROTOC_DIR := $(shell pwd)/protobuf/script/
+PROTOC_DIR := $(shell pwd)/protobuf/script/mac/
 platform=$(shell uname -s)
 SED_CMD = sed -i ''
 ifeq ($(platform), Linux)
@@ -27,7 +27,7 @@ test:
 windows:
 	CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o bic-cd main.go
 linux:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o bic-cd main.go
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o bic-cd main.go
 mac:
 	CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags " -X 'main.goVersion=$(go version)' -X 'main.gitTag=v1.88.88' -X 'main.gitHash=$(git show -s --format=%H)'" -o bic-cd main.go
 

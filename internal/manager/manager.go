@@ -1,9 +1,11 @@
 package manager
 
 import (
+	"bic-cd/internal/manager/service"
 	"bic-cd/internal/model"
 	"bic-cd/pkg/db"
 	"bic-cd/pkg/gen/api"
+	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,7 +16,7 @@ func (m Manager) GetServices(ctx *gin.Context, in *api.RequestGetService) (out *
 	var total int64
 	if err := db.DB().Model(&model.Service{}).
 		Count(&total).
-		Offset(int(in.Page * in.PageSize)).
+		Offset(int((in.Page - 1) * in.PageSize)).
 		Limit(int(in.PageSize)).
 		Find(&data).Error; err != nil {
 		code = api.ECDbFindError.Wrap(err)
@@ -59,6 +61,21 @@ func (m Manager) PostServices(ctx *gin.Context, in *api.RequestPostService) (out
 	return out, api.ECSuccess
 }
 
-func (m Manager) PostServiceDeploy(ctx *gin.Context, in *api.RequestPostService, id uint) (out *api.ResponsePostService, code api.ErrCode) {
+func (m Manager) PostServiceDeploy(ctx *gin.Context, id uint) (out *api.ResponsePostServiceDeploy, code api.ErrCode) {
+	var data model.Service
+	if err := db.DB().First(&data, id).Error; err != nil {
+		code = api.ECDbFindError.Wrap(err)
+		return
+	}
+	f, err := service.CreateService(service.Config{Service: data})
+	if err != nil {
+		code = api.ECServerError
+		return
+	}
+	out = &api.ResponsePostServiceDeploy{
+		Id:          uint32(id),
+		FileContent: f,
+	}
+	fmt.Println(f)
 	return out, api.ECSuccess
 }

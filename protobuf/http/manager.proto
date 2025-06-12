@@ -1,6 +1,7 @@
 syntax = "proto3";
 package http;
 option go_package = "pkg/gen/api";
+import "http/common.proto";
 
 message RequestGetService{
   uint32 page = 1;
@@ -41,11 +42,20 @@ message ResponsePostService{
   uint32 id = 1;
 }
 
+message RequestPostServiceDeploy{
+
+}
+
+message ResponsePostServiceDeploy{
+  uint32 id = 1;
+  string file_content = 2;
+}
+
 service manager_service{
   // @Summary: 获取服务列表 @url:/bic-cd/manager/v1/services/
   rpc GetServices(RequestGetService) returns (ResponseGetService);
   // @Summary: 添加服务 @url:/bic-cd/manager/v1/services/
   rpc PostServices(RequestPostService) returns (ResponsePostService);
   // @Summary: 部署服务 @url:/bic-cd/manager/v1/service/<uint:id>/deploy
-  rpc PostServiceDeploy(RequestPostService) returns (ResponsePostService);
+  rpc PostServiceDeploy(http.CommonNil) returns (ResponsePostServiceDeploy);
 }

@@ -149,7 +149,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/api.RequestPostService"
+                            "$ref": "#/definitions/api.CommonNil"
                         }
                     }
                 ],
@@ -165,7 +165,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/api.ResponsePostService"
+                                            "$ref": "#/definitions/api.ResponsePostServiceDeploy"
                                         }
                                     }
                                 }
@@ -298,6 +298,9 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "api.CommonNil": {
+            "type": "object"
+        },
         "api.RequestAuth": {
             "type": "object",
             "required": [
@@ -408,6 +411,17 @@ const docTemplate = `{
         "api.ResponsePostService": {
             "type": "object",
             "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "api.ResponsePostServiceDeploy": {
+            "type": "object",
+            "properties": {
+                "file_content": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 }

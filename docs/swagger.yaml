@@ -1,4 +1,6 @@
 definitions:
+  api.CommonNil:
+    type: object
   api.RequestAuth:
     properties:
       password:
@@ -76,6 +78,13 @@ definitions:
     type: object
   api.ResponsePostService:
     properties:
+      id:
+        type: integer
+    type: object
+  api.ResponsePostServiceDeploy:
+    properties:
+      file_content:
+        type: string
       id:
         type: integer
     type: object
@@ -202,7 +211,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/api.RequestPostService'
+          $ref: '#/definitions/api.CommonNil'
       produces:
       - application/json
       responses:
@@ -213,7 +222,7 @@ paths:
             - $ref: '#/definitions/gen.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/api.ResponsePostService'
+                  $ref: '#/definitions/api.ResponsePostServiceDeploy'
               type: object
         "401":
           description: header need Authorization data

@@ -94,11 +94,6 @@ definitions:
     type: object
   api.ResponsePostAdmin:
     type: object
-  api.ResponsePostService:
-    properties:
-      id:
-        type: integer
-    type: object
   api.ResponsePostServiceDeploy:
     properties:
       file_content:
@@ -246,6 +241,37 @@ paths:
       summary: 获取token
       tags:
       - Auth-Service
+  /bic-cd/manager/v1/service/:id/:
+    delete:
+      parameters:
+      - description: some id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/gen.Response'
+            - properties:
+                data:
+                  type: object
+              type: object
+        "401":
+          description: header need Authorization data
+          schema:
+            type: string
+        "403":
+          description: no api permission or no obj permission
+          schema:
+            type: string
+      summary: 删除服务
+      tags:
+      - Manager-Service
   /bic-cd/manager/v1/service/:id/deploy:
     post:
       parameters:
@@ -511,7 +537,7 @@ paths:
             - $ref: '#/definitions/gen.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/api.ResponsePostService'
+                  type: object
               type: object
         "401":
           description: header need Authorization data

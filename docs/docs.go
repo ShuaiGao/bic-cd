@@ -126,6 +126,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/bic-cd/manager/v1/service/:id/": {
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Manager-Service"
+                ],
+                "summary": "删除服务",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "some id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/gen.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "header need Authorization data",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "no api permission or no obj permission",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/bic-cd/manager/v1/service/:id/deploy": {
             "post": {
                 "produces": [
@@ -566,7 +618,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/api.ResponsePostService"
+                                            "type": "object"
                                         }
                                     }
                                 }
@@ -727,14 +779,6 @@ const docTemplate = `{
         },
         "api.ResponsePostAdmin": {
             "type": "object"
-        },
-        "api.ResponsePostService": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                }
-            }
         },
         "api.ResponsePostServiceDeploy": {
             "type": "object",

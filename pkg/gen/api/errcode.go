@@ -72,4 +72,5 @@ var (
 	ECDbExecError           = Err{code: 102009, msg: "sql执行错误"}
 	ECParamValidatorError   = Err{code: 102200, msg: "参数校验错误"}
 	ECRepeatedVersion       = Err{code: 102201, msg: "该服务版本已存在"}
+	ECServiceHasInstance    = Err{code: 102202, msg: "存在服务实例，不能移除服务"}
 )

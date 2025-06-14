@@ -62,6 +62,20 @@ func (m Manager) PostServices(ctx *gin.Context, in *api.RequestPostService) (out
 	return out, api.ECSuccess
 }
 
+func (m Manager) DeleteServices(ctx *gin.Context, id uint) (out *api.CommonNil, code api.ErrCode) {
+	var instanceCount int64
+	if err := db.DB().Model(&model.ServiceInstance{}).Where("service_id = ?", id).Count(&instanceCount).Error; err != nil {
+		return nil, api.ECDbFindError.Wrap(err)
+	}
+	if instanceCount > 0 {
+		return nil, api.ECServiceHasInstance
+	}
+	if err := db.DB().Delete(&model.Service{}, id).Error; err != nil {
+		return nil, api.ECDbDeleteError.Wrap(err)
+	}
+	return out, api.ECSuccess
+}
+
 func (m Manager) PostServiceDeploy(ctx *gin.Context, in *api.RequestPostServiceDeploy, id uint) (out *api.ResponsePostServiceDeploy, code api.ErrCode) {
 	var count int64
 	if err := db.DB().Model(&model.ServiceInstance{}).

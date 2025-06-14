@@ -18,6 +18,7 @@ type App struct {
 	ApiKey        string `yaml:"api_key"`
 	SqlitePath    string `yaml:"sqlite_path"`
 	RunMode       string `yaml:"run_mode"`
+	WorkspacePath string `yaml:"workspace_path"`
 }
 
 var GlobalConf = &Config{}

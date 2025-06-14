@@ -84,6 +84,8 @@ service manager_service{
   rpc GetServices(RequestGetService) returns (ResponseGetService);
   // @Summary: 添加服务 @url:/bic-cd/manager/v1/services/
   rpc PostServices(RequestPostService) returns (ResponsePostService);
+  // @Summary: 删除服务 @url:/bic-cd/manager/v1/service/<uint:id>/
+  rpc DeleteServices(http.CommonNil) returns (http.CommonNil);
   // @Summary: 部署服务 @url:/bic-cd/manager/v1/service/<uint:id>/deploy
   rpc PostServiceDeploy(RequestPostServiceDeploy) returns (ResponsePostServiceDeploy);
   // @Summary: 启动服务 @url:/bic-cd/manager/v1/service/instance/<uint:id>/start

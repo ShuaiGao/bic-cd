@@ -9,7 +9,7 @@ import (
 
 type Service struct {
 	gorm.Model
-	Name        string `gorm:"unique;index;size:255"`
+	Name        string `gorm:"comment:服务名;size:128;uniqueIndex:idx_name,expression:CASE WHEN deleted_at IS NULL THEN name ELSE NULL END"`
 	Description string `gorm:"comment:服务描述"`
 	WorkingDir  string `gorm:"comment:工作目录"`
 	User        string `gorm:"comment:运行用户"`

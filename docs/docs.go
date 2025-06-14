@@ -149,6 +149,119 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
+                            "$ref": "#/definitions/api.RequestPostServiceDeploy"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/gen.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/api.ResponsePostServiceDeploy"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "header need Authorization data",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "no api permission or no obj permission",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/bic-cd/manager/v1/service/instance/:id/": {
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Manager-Service"
+                ],
+                "summary": "移除服务",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "some id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/gen.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/api.CommonNil"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "header need Authorization data",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "no api permission or no obj permission",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/bic-cd/manager/v1/service/instance/:id/start": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Manager-Service"
+                ],
+                "summary": "启动服务",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "some id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "body 参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
                             "$ref": "#/definitions/api.CommonNil"
                         }
                     }
@@ -166,6 +279,185 @@ const docTemplate = `{
                                     "properties": {
                                         "data": {
                                             "$ref": "#/definitions/api.ResponsePostServiceDeploy"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "header need Authorization data",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "no api permission or no obj permission",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/bic-cd/manager/v1/service/instance/:id/status": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Manager-Service"
+                ],
+                "summary": "服务状态",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "some id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "body 参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.CommonNil"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/gen.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/api.ResponsePostServiceStatus"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "header need Authorization data",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "no api permission or no obj permission",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/bic-cd/manager/v1/service/instance/:id/stop": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Manager-Service"
+                ],
+                "summary": "停止服务",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "some id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "body 参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.CommonNil"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/gen.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/api.ResponsePostServiceDeploy"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "header need Authorization data",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "no api permission or no obj permission",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/bic-cd/manager/v1/service/instances/": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Manager-Service"
+                ],
+                "summary": "获取服务实例列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "参数无注释",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "参数无注释",
+                        "name": "page_size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/gen.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/api.ResponseGetServiceInstance"
                                         }
                                     }
                                 }
@@ -368,6 +660,14 @@ const docTemplate = `{
                 }
             }
         },
+        "api.RequestPostServiceDeploy": {
+            "type": "object",
+            "properties": {
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
         "api.ResponseAuth": {
             "type": "object",
             "properties": {
@@ -405,6 +705,26 @@ const docTemplate = `{
                 }
             }
         },
+        "api.ResponseGetServiceInstance": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.ServiceInstanceItem"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "api.ResponsePostAdmin": {
             "type": "object"
         },
@@ -424,6 +744,49 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                }
+            }
+        },
+        "api.ResponsePostServiceStatus": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "stdout": {
+                    "type": "string"
+                }
+            }
+        },
+        "api.ServiceInstanceItem": {
+            "type": "object",
+            "properties": {
+                "ServiceItem": {
+                    "$ref": "#/definitions/api.ServiceItem"
+                },
+                "create_at": {
+                    "description": "创建时间",
+                    "type": "string"
+                },
+                "exec_start": {
+                    "description": "启动命令",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "id",
+                    "type": "integer"
+                },
+                "instance_name": {
+                    "description": "service instance name",
+                    "type": "string"
+                },
+                "port": {
+                    "description": "服务名",
+                    "type": "integer"
+                },
+                "version": {
+                    "description": "版本号",
+                    "type": "string"
                 }
             }
         },

@@ -49,6 +49,11 @@ definitions:
         description: 工作目录
         type: string
     type: object
+  api.RequestPostServiceDeploy:
+    properties:
+      version:
+        type: string
+    type: object
   api.ResponseAuth:
     properties:
       token:
@@ -74,6 +79,19 @@ definitions:
       total:
         type: integer
     type: object
+  api.ResponseGetServiceInstance:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/api.ServiceInstanceItem'
+        type: array
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
+    type: object
   api.ResponsePostAdmin:
     type: object
   api.ResponsePostService:
@@ -87,6 +105,36 @@ definitions:
         type: string
       id:
         type: integer
+    type: object
+  api.ResponsePostServiceStatus:
+    properties:
+      id:
+        type: integer
+      stdout:
+        type: string
+    type: object
+  api.ServiceInstanceItem:
+    properties:
+      ServiceItem:
+        $ref: '#/definitions/api.ServiceItem'
+      create_at:
+        description: 创建时间
+        type: string
+      exec_start:
+        description: 启动命令
+        type: string
+      id:
+        description: id
+        type: integer
+      instance_name:
+        description: service instance name
+        type: string
+      port:
+        description: 服务名
+        type: integer
+      version:
+        description: 版本号
+        type: string
     type: object
   api.ServiceItem:
     properties:
@@ -211,7 +259,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/api.CommonNil'
+          $ref: '#/definitions/api.RequestPostServiceDeploy'
       produces:
       - application/json
       responses:
@@ -233,6 +281,182 @@ paths:
           schema:
             type: string
       summary: 部署服务
+      tags:
+      - Manager-Service
+  /bic-cd/manager/v1/service/instance/:id/:
+    delete:
+      parameters:
+      - description: some id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/gen.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/api.CommonNil'
+              type: object
+        "401":
+          description: header need Authorization data
+          schema:
+            type: string
+        "403":
+          description: no api permission or no obj permission
+          schema:
+            type: string
+      summary: 移除服务
+      tags:
+      - Manager-Service
+  /bic-cd/manager/v1/service/instance/:id/start:
+    post:
+      parameters:
+      - description: some id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: body 参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.CommonNil'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/gen.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/api.ResponsePostServiceDeploy'
+              type: object
+        "401":
+          description: header need Authorization data
+          schema:
+            type: string
+        "403":
+          description: no api permission or no obj permission
+          schema:
+            type: string
+      summary: 启动服务
+      tags:
+      - Manager-Service
+  /bic-cd/manager/v1/service/instance/:id/status:
+    post:
+      parameters:
+      - description: some id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: body 参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.CommonNil'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/gen.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/api.ResponsePostServiceStatus'
+              type: object
+        "401":
+          description: header need Authorization data
+          schema:
+            type: string
+        "403":
+          description: no api permission or no obj permission
+          schema:
+            type: string
+      summary: 服务状态
+      tags:
+      - Manager-Service
+  /bic-cd/manager/v1/service/instance/:id/stop:
+    post:
+      parameters:
+      - description: some id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: body 参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.CommonNil'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/gen.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/api.ResponsePostServiceDeploy'
+              type: object
+        "401":
+          description: header need Authorization data
+          schema:
+            type: string
+        "403":
+          description: no api permission or no obj permission
+          schema:
+            type: string
+      summary: 停止服务
+      tags:
+      - Manager-Service
+  /bic-cd/manager/v1/service/instances/:
+    get:
+      parameters:
+      - description: 参数无注释
+        in: query
+        name: page
+        type: integer
+      - description: 参数无注释
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/gen.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/api.ResponseGetServiceInstance'
+              type: object
+        "401":
+          description: header need Authorization data
+          schema:
+            type: string
+        "403":
+          description: no api permission or no obj permission
+          schema:
+            type: string
+      summary: 获取服务实例列表
       tags:
       - Manager-Service
   /bic-cd/manager/v1/services/:

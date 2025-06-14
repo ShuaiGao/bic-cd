@@ -32,7 +32,7 @@ func Setup() {
 	}
 	var err error
 	db, err = gorm.Open(sqlite.Open(sqlitePath), &gorm.Config{
-		Logger:          logger.Default.LogMode(logger.Warn),
+		Logger:          logger.Default.LogMode(logger.Info),
 		CreateBatchSize: 100,
 	})
 	if err != nil {

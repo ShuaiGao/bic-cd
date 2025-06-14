@@ -43,7 +43,7 @@ message ResponsePostService{
 }
 
 message RequestPostServiceDeploy{
-
+  string version = 1;
 }
 
 message ResponsePostServiceDeploy{
@@ -51,11 +51,49 @@ message ResponsePostServiceDeploy{
   string file_content = 2;
 }
 
+message ResponsePostServiceStatus{
+  uint32 id = 1;
+  string stdout = 2;
+}
+
+message RequestGetServiceInstance{
+  uint32 page = 1;
+  uint32 page_size = 2;
+}
+
+message ServiceInstanceItem{
+  ServiceItem ServiceItem = 1;
+  uint32 id = 2; // id
+  uint32 port = 3; // 服务名
+  string exec_start = 4; // 启动命令
+  string version = 5;// 版本号
+  string create_at = 6; // 创建时间
+  string instance_name = 7; // service instance name
+}
+
+message ResponseGetServiceInstance{
+  uint32 page = 1;
+  uint32 page_size = 2;
+  uint32 total = 3;
+  repeated ServiceInstanceItem items = 4;
+}
+
+
 service manager_service{
   // @Summary: 获取服务列表 @url:/bic-cd/manager/v1/services/
   rpc GetServices(RequestGetService) returns (ResponseGetService);
   // @Summary: 添加服务 @url:/bic-cd/manager/v1/services/
   rpc PostServices(RequestPostService) returns (ResponsePostService);
   // @Summary: 部署服务 @url:/bic-cd/manager/v1/service/<uint:id>/deploy
-  rpc PostServiceDeploy(http.CommonNil) returns (ResponsePostServiceDeploy);
+  rpc PostServiceDeploy(RequestPostServiceDeploy) returns (ResponsePostServiceDeploy);
+  // @Summary: 启动服务 @url:/bic-cd/manager/v1/service/instance/<uint:id>/start
+  rpc PostServiceStart(http.CommonNil) returns (ResponsePostServiceDeploy);
+  // @Summary: 停止服务 @url:/bic-cd/manager/v1/service/instance/<uint:id>/stop
+  rpc PostServiceStop(http.CommonNil) returns (ResponsePostServiceDeploy);
+  // @Summary: 服务状态 @url:/bic-cd/manager/v1/service/instance/<uint:id>/status
+  rpc PostServiceStatus(http.CommonNil) returns (ResponsePostServiceStatus);
+  // @Summary: 获取服务实例列表 @url:/bic-cd/manager/v1/service/instances/
+  rpc GetServiceInstances(RequestGetServiceInstance) returns (ResponseGetServiceInstance);
+  // @Summary: 移除服务 @url:/bic-cd/manager/v1/service/instance/<uint:id>/
+  rpc DeleteServiceInstance(http.CommonNil) returns (http.CommonNil);
 }

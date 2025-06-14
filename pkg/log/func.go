@@ -27,7 +27,7 @@ func Warn(ctx context.Context, args ...interface{}) {
 	logger.C(ctx).Warn(args...)
 }
 
-func Errorf(ctx context.Context, args ...interface{}) {
+func Errorf(ctx context.Context, format string, args ...interface{}) {
 	logger.C(ctx).Error(args...)
 }
 

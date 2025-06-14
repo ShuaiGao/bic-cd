@@ -2,7 +2,6 @@ package api
 
 import (
 	"errors"
-	"github.com/gin-gonic/gin"
 )
 
 type ErrCode interface {
@@ -21,9 +20,9 @@ func (e Err) Code() int {
 }
 
 func (e Err) String() string {
-	if !gin.IsDebugging() {
-		return e.msg
-	}
+	//if !gin.IsDebugging() {
+	//	return e.msg
+	//}
 	if e.detail != nil {
 		return e.msg + ", detail: " + e.detail.Error()
 	}
@@ -72,4 +71,5 @@ var (
 	ECDbCountError          = Err{code: 102008, msg: "数据库count错误"}
 	ECDbExecError           = Err{code: 102009, msg: "sql执行错误"}
 	ECParamValidatorError   = Err{code: 102200, msg: "参数校验错误"}
+	ECRepeatedVersion       = Err{code: 102201, msg: "该服务版本已存在"}
 )

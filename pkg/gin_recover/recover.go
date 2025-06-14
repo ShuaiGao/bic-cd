@@ -17,9 +17,10 @@ func Recovery() gin.HandlerFunc {
 				// stack := stack(3) //gin官方recovery
 				reset := string([]byte{27, 91, 48, 109}) //重置颜色
 				log.Errorf(c, "[Recovery] panic recovered:\n%s\n\n%s%s", err, stack, reset)
+				code := api.ECServerError.Wrap(err)
 				c.JSON(http.StatusInternalServerError, gin.H{
-					"code":   api.ECServerError.Code(),
-					"detail": api.ECServerError.String(),
+					"code":   code.Code(),
+					"detail": code.String(),
 				})
 			}
 		}()

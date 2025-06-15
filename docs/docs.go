@@ -156,7 +156,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "object"
+                                            "$ref": "#/definitions/api.CommonNil"
                                         }
                                     }
                                 }
@@ -531,6 +531,67 @@ const docTemplate = `{
                 }
             }
         },
+        "/bic-cd/manager/v1/service/version/:id/": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Manager-Service"
+                ],
+                "summary": "服务流量切换",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "some id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "body 参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RequestPostServiceVersion"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/gen.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/api.CommonNil"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "header need Authorization data",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "no api permission or no obj permission",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/bic-cd/manager/v1/services/": {
             "get": {
                 "produces": [
@@ -618,7 +679,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "object"
+                                            "$ref": "#/definitions/api.ResponsePostService"
                                         }
                                     }
                                 }
@@ -720,6 +781,14 @@ const docTemplate = `{
                 }
             }
         },
+        "api.RequestPostServiceVersion": {
+            "type": "object",
+            "properties": {
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
         "api.ResponseAuth": {
             "type": "object",
             "properties": {
@@ -779,6 +848,14 @@ const docTemplate = `{
         },
         "api.ResponsePostAdmin": {
             "type": "object"
+        },
+        "api.ResponsePostService": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
         },
         "api.ResponsePostServiceDeploy": {
             "type": "object",

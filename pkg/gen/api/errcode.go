@@ -73,4 +73,7 @@ var (
 	ECParamValidatorError   = Err{code: 102200, msg: "参数校验错误"}
 	ECRepeatedVersion       = Err{code: 102201, msg: "该服务版本已存在"}
 	ECServiceHasInstance    = Err{code: 102202, msg: "存在服务实例，不能移除服务"}
+	ECNginxConfig           = Err{code: 102203, msg: "nginx配置出错"}
+	ECNginxTest             = Err{code: 102204, msg: "nginx test 出错"}
+	ECNginxReload           = Err{code: 102205, msg: "nginx reload 出错"}
 )

@@ -54,6 +54,11 @@ definitions:
       version:
         type: string
     type: object
+  api.RequestPostServiceVersion:
+    properties:
+      version:
+        type: string
+    type: object
   api.ResponseAuth:
     properties:
       token:
@@ -93,6 +98,11 @@ definitions:
         type: integer
     type: object
   api.ResponsePostAdmin:
+    type: object
+  api.ResponsePostService:
+    properties:
+      id:
+        type: integer
     type: object
   api.ResponsePostServiceDeploy:
     properties:
@@ -259,7 +269,7 @@ paths:
             - $ref: '#/definitions/gen.Response'
             - properties:
                 data:
-                  type: object
+                  $ref: '#/definitions/api.CommonNil'
               type: object
         "401":
           description: header need Authorization data
@@ -485,6 +495,43 @@ paths:
       summary: 获取服务实例列表
       tags:
       - Manager-Service
+  /bic-cd/manager/v1/service/version/:id/:
+    post:
+      parameters:
+      - description: some id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: body 参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.RequestPostServiceVersion'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/gen.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/api.CommonNil'
+              type: object
+        "401":
+          description: header need Authorization data
+          schema:
+            type: string
+        "403":
+          description: no api permission or no obj permission
+          schema:
+            type: string
+      summary: 服务流量切换
+      tags:
+      - Manager-Service
   /bic-cd/manager/v1/services/:
     get:
       parameters:
@@ -537,7 +584,7 @@ paths:
             - $ref: '#/definitions/gen.Response'
             - properties:
                 data:
-                  type: object
+                  $ref: '#/definitions/api.ResponsePostService'
               type: object
         "401":
           description: header need Authorization data

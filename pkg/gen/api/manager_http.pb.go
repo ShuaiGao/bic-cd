@@ -26,6 +26,7 @@ func RegisterManagerServiceHttpHandler(g *gin.RouterGroup, srvs ManagerService) 
 	g.POST("/bic-cd/manager/v1/service/instance/:id/status", tmp.PostServiceStatus)
 	g.GET("/bic-cd/manager/v1/service/instances/", tmp.GetServiceInstances)
 	g.DELETE("/bic-cd/manager/v1/service/instance/:id/", tmp.DeleteServiceInstance)
+	g.POST("/bic-cd/manager/v1/service/version/:id/", tmp.PostServiceVersion)
 }
 
 type ManagerService interface {
@@ -38,6 +39,7 @@ type ManagerService interface {
 	PostServiceStatus(ctx *gin.Context, id uint) (out *ResponsePostServiceStatus, code ErrCode)
 	GetServiceInstances(ctx *gin.Context, in *RequestGetServiceInstance) (out *ResponseGetServiceInstance, code ErrCode)
 	DeleteServiceInstance(ctx *gin.Context, id uint) (out *CommonNil, code ErrCode)
+	PostServiceVersion(ctx *gin.Context, in *RequestPostServiceVersion, id uint) (out *CommonNil, code ErrCode)
 }
 
 // generated http handle
@@ -51,6 +53,7 @@ type ManagerServiceHttpHandler interface {
 	PostServiceStatus(ctx *gin.Context)
 	GetServiceInstances(ctx *gin.Context)
 	DeleteServiceInstance(ctx *gin.Context)
+	PostServiceVersion(ctx *gin.Context)
 }
 
 type x_ManagerService struct {
@@ -96,7 +99,7 @@ func (x *x_ManagerService) GetServices(ctx *gin.Context) {
 // @Tags		Manager-Service
 // @Produce	json
 // @Param		data	body		RequestPostService	true	"body 参数"
-// @Success	200		{object}	gen.Response{data=nil}
+// @Success	200		{object}	gen.Response{data=ResponsePostService}
 // @Failure	401		{string}	string	"header need Authorization data"
 // @Failure	403		{string}	string	"no api permission or no obj permission"
 // @Router		/bic-cd/manager/v1/services/ [POST]
@@ -130,7 +133,7 @@ func (x *x_ManagerService) PostServices(ctx *gin.Context) {
 // @Tags		Manager-Service
 // @Produce	json
 // @Param		id	path		uint	true	"some id"
-// @Success	200	{object}	gen.Response{data=nil}
+// @Success	200	{object}	gen.Response{data=CommonNil}
 // @Failure	401	{string}	string	"header need Authorization data"
 // @Failure	403	{string}	string	"no api permission or no obj permission"
 // @Router		/bic-cd/manager/v1/service/:id/ [DELETE]
@@ -329,6 +332,49 @@ func (x *x_ManagerService) DeleteServiceInstance(ctx *gin.Context) {
 		return
 	}
 	rsp, errCode := x.xx.DeleteServiceInstance(ctx, uint(id))
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":   errCode.Code(),
+		"detail": errCode.String(),
+		"data":   rsp,
+	})
+}
+
+// @Summary	服务流量切换
+// @Tags		Manager-Service
+// @Produce	json
+// @Param		id		path		uint						true	"some id"
+// @Param		data	body		RequestPostServiceVersion	true	"body 参数"
+// @Success	200		{object}	gen.Response{data=CommonNil}
+// @Failure	401		{string}	string	"header need Authorization data"
+// @Failure	403		{string}	string	"no api permission or no obj permission"
+// @Router		/bic-cd/manager/v1/service/version/:id/ [POST]
+func (x *x_ManagerService) PostServiceVersion(ctx *gin.Context) {
+	req := &RequestPostServiceVersion{}
+	if err := ctx.ShouldBindJSON(req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"code": 400, "detail": "request error"})
+		return
+	}
+	if err := ManagerServiceValidate.Struct(req); err != nil {
+		msg := "request param validator error"
+		if gin.Mode() == gin.DebugMode {
+			msg = msg + " | " + err.Error()
+		}
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":   400,
+			"detail": msg,
+		})
+		return
+	}
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil || id < 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":   400,
+			"detail": "param id should be int",
+		})
+		return
+	}
+	rsp, errCode := x.xx.PostServiceVersion(ctx, req, uint(id))
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"code":   errCode.Code(),

@@ -1,10 +1,12 @@
 package manager
 
 import (
+	"bic-cd/internal/manager/nginx"
 	"bic-cd/internal/manager/service"
 	"bic-cd/internal/model"
 	"bic-cd/pkg/db"
 	"bic-cd/pkg/gen/api"
+	"bic-cd/pkg/log"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -194,7 +196,7 @@ func (m Manager) GetServiceInstances(ctx *gin.Context, in *api.RequestGetService
 	for _, v := range data {
 		out.Items = append(out.Items, &api.ServiceInstanceItem{
 			ServiceItem: &api.ServiceItem{
-				Id:          uint32(v.ID),
+				Id:          uint32(v.Service.ID),
 				Name:        v.Service.Name,
 				Description: v.Service.Description,
 				WorkingDir:  v.Service.WorkingDir,
@@ -231,6 +233,42 @@ func (m Manager) DeleteServiceInstance(ctx *gin.Context, id uint) (out *api.Comm
 	}
 	if err := db.DB().Delete(&data).Error; err != nil {
 		code = api.ECDbDeleteError.Wrap(err)
+		return
+	}
+	return
+}
+
+func (m Manager) PostServiceVersion(ctx *gin.Context, in *api.RequestPostServiceVersion, id uint) (out *api.CommonNil, code api.ErrCode) {
+	code = api.ECSuccess
+	var data model.ServiceInstance
+	log.XInfo("nginx ", id)
+	if err := db.DB().Preload("Service").First(&data, id).Error; err != nil {
+		code = api.ECDbFindError.Wrap(err)
+		return
+	}
+	log.XInfo("nginx 2222")
+	if data.Service.Version == in.Version {
+		code = api.ECSuccess
+		return
+	}
+	log.XInfo("nginx 3333")
+	config := nginx.NginxConfig{
+		Domain: data.Service.Name,
+		Port:   data.Port,
+	}
+	log.XInfo("nginx 4444")
+	if err := nginx.CreateNginxConfig(config); err != nil {
+		code = api.ECNginxConfig.Wrap(err)
+		return
+	}
+	log.XInfo("nginx 5555")
+	if err := nginx.ExecuteNginxTest(); err != nil {
+		code = api.ECNginxTest.Wrap(err)
+		return
+	}
+	log.XInfo("nginx 6666")
+	if err := nginx.ExecuteNginx(); err != nil {
+		code = api.ECNginxReload.Wrap(err)
 		return
 	}
 	return

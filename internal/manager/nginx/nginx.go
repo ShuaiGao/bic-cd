@@ -1,7 +1,6 @@
 package nginx
 
 import (
-	"bic-cd/internal/util"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -17,28 +16,25 @@ const (
 	nginxConfigDir = "/etc/nginx/conf.d/"
 )
 
-type Service struct {
-	Name string
-	IP   string
-	Port int
-}
-
 type NginxConfig struct {
-	Domain          string    `json:"domain"`
-	Services        []Service `json:"services"`
-	EnableHTTPS     bool      `json:"enable_https"`      // 是否启用HTTPS
-	SSLCertPath     string    `json:"ssl_cert_path"`     // SSL证书路径
-	SSLKeyPath      string    `json:"ssl_key_path"`      // SSL私钥路径
-	HSTS            bool      `json:"hsts"`              // 是否启用HSTS
-	SSLProtocols    string    `json:"ssl_protocols"`     // SSL协议版本
-	SSLCiphers      string    `json:"ssl_ciphers"`       // SSL密码套件
-	SSLPreferServer bool      `json:"ssl_prefer_server"` // SSL优先使用服务器密码套件
+	Domain          string `json:"domain"`
+	Port            uint16 `json:"port"`
+	EnableHTTPS     bool   `json:"enable_https"`      // 是否启用HTTPS
+	SSLCertPath     string `json:"ssl_cert_path"`     // SSL证书路径
+	SSLKeyPath      string `json:"ssl_key_path"`      // SSL私钥路径
+	HSTS            bool   `json:"hsts"`              // 是否启用HSTS
+	SSLProtocols    string `json:"ssl_protocols"`     // SSL协议版本
+	SSLCiphers      string `json:"ssl_ciphers"`       // SSL密码套件
+	SSLPreferServer bool   `json:"ssl_prefer_server"` // SSL优先使用服务器密码套件
 }
 
-var nginxConfigTemplate = template.Must(template.New("nginx").Parse(`upstream {{.Domain}}_backend {
-{{- range .Services}}
-    server {{.IP}}:{{.Port}};
-{{- end}}
+func (n *NginxConfig) GetConfigFilePath() string {
+	return filepath.Join(nginxConfigDir, n.Domain+".conf")
+}
+
+var nginxConfigTemplate = template.Must(template.New("nginx").Parse(`
+upstream {{.Domain}}_backend {
+    server 127.0.0.1:{{.Port}};
 }
 
 {{- if .EnableHTTPS}}
@@ -117,18 +113,13 @@ func configureNginx(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := validateNginxConfig(config); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	configFile := filepath.Join(nginxConfigDir, config.Domain+".conf")
-	if err := createNginxConfig(configFile, config); err != nil {
+	//configFile := filepath.Join(nginxConfigDir, config.Domain+".conf")
+	if err := CreateNginxConfig(config); err != nil {
 		http.Error(w, "Failed to create nginx configuration", http.StatusInternalServerError)
 		return
 	}
 
-	if err := executeNginx("reload"); err != nil {
+	if err := ExecuteNginx("reload"); err != nil {
 		http.Error(w, "Failed to reload nginx", http.StatusInternalServerError)
 		return
 	}
@@ -137,23 +128,9 @@ func configureNginx(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Nginx configured for %s", config.Domain)
 }
 
-func validateNginxConfig(config NginxConfig) error {
-	if config.Domain == "" {
-		return fmt.Errorf("domain is required")
-	}
-	if len(config.Services) == 0 {
-		return fmt.Errorf("at least one service is required")
-	}
-	for _, s := range config.Services {
-		if !util.IsValidName(s.Name) {
-			return fmt.Errorf("invalid service name: %s", s.Name)
-		}
-	}
-	return nil
-}
-
-// 使用模板生成Nginx配置文件
-func createNginxConfig(path string, config NginxConfig) error {
+// CreateNginxConfig 使用模板生成Nginx配置文件
+func CreateNginxConfig(config NginxConfig) error {
+	path := config.GetConfigFilePath()
 	file, err := os.Create(path)
 	if err != nil {
 		return err
@@ -163,7 +140,17 @@ func createNginxConfig(path string, config NginxConfig) error {
 	return nginxConfigTemplate.Execute(file, config)
 }
 
-func executeNginx(args ...string) error {
+func ExecuteNginxTest(args ...string) error {
+	cmd := exec.Command("nginx", append([]string{"-t"}, args...)...)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Printf("Nginx test error: %s, Output: %s", err, string(output))
+		return err
+	}
+	return nil
+}
+
+func ExecuteNginx(args ...string) error {
 	cmd := exec.Command("nginx", append([]string{"-s"}, args...)...)
 	output, err := cmd.CombinedOutput()
 	if err != nil {

@@ -78,6 +78,9 @@ message ResponseGetServiceInstance{
   repeated ServiceInstanceItem items = 4;
 }
 
+message RequestPostServiceVersion{
+  string version = 1;
+}
 
 service manager_service{
   // @Summary: 获取服务列表 @url:/bic-cd/manager/v1/services/
@@ -98,4 +101,6 @@ service manager_service{
   rpc GetServiceInstances(RequestGetServiceInstance) returns (ResponseGetServiceInstance);
   // @Summary: 移除服务 @url:/bic-cd/manager/v1/service/instance/<uint:id>/
   rpc DeleteServiceInstance(http.CommonNil) returns (http.CommonNil);
+  // @Summary: 服务流量切换 @url:/bic-cd/manager/v1/service/version/<uint:id>/
+  rpc PostServiceVersion(RequestPostServiceVersion) returns (http.CommonNil);
 }

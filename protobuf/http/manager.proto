@@ -18,6 +18,7 @@ message ServiceItem{
   int32 port_min = 7;// 最小端口号
   int32 port_max = 8;// 最大端口号
   string config = 9;// 配置文件
+  string version = 10; // 版本号
 }
 
 message ResponseGetService{
@@ -36,6 +37,7 @@ message RequestPostService{
   int32 port_min = 6;// 最小端口号
   int32 port_max = 7;// 最大端口号
   string config = 8;// 配置文件
+  string domain = 9; // 域名
 }
 
 message ResponsePostService{
@@ -61,14 +63,18 @@ message RequestGetServiceInstance{
   uint32 page_size = 2;
 }
 
-message ServiceInstanceItem{
-  ServiceItem ServiceItem = 1;
+message Instance{
   uint32 id = 2; // id
   uint32 port = 3; // 服务名
   string exec_start = 4; // 启动命令
   string version = 5;// 版本号
   string create_at = 6; // 创建时间
   string instance_name = 7; // service instance name
+}
+
+message ServiceInstanceItem{
+  ServiceItem ServiceItem = 1;
+  repeated Instance instances = 2;
 }
 
 message ResponseGetServiceInstance{
@@ -93,7 +99,7 @@ service manager_service{
   rpc PostServiceDeploy(RequestPostServiceDeploy) returns (ResponsePostServiceDeploy);
   // @Summary: 启动服务 @url:/bic-cd/manager/v1/service/instance/<uint:id>/start
   rpc PostServiceStart(http.CommonNil) returns (ResponsePostServiceDeploy);
-  // @Summary: 停止服务 @url:/bic-cd/manager/v1/service/instance/<uint:id>/stop
+  // @Summary: 删除服务实例 @url:/bic-cd/manager/v1/service/instance/<uint:id>/stop
   rpc PostServiceStop(http.CommonNil) returns (ResponsePostServiceDeploy);
   // @Summary: 服务状态 @url:/bic-cd/manager/v1/service/instance/<uint:id>/status
   rpc PostServiceStatus(http.CommonNil) returns (ResponsePostServiceStatus);

@@ -1,6 +1,27 @@
 definitions:
   api.CommonNil:
     type: object
+  api.Instance:
+    properties:
+      create_at:
+        description: 创建时间
+        type: string
+      exec_start:
+        description: 启动命令
+        type: string
+      id:
+        description: id
+        type: integer
+      instance_name:
+        description: service instance name
+        type: string
+      port:
+        description: 服务名
+        type: integer
+      version:
+        description: 版本号
+        type: string
+    type: object
   api.RequestAuth:
     properties:
       password:
@@ -29,6 +50,9 @@ definitions:
         type: string
       description:
         description: 服务描述
+        type: string
+      domain:
+        description: 域名
         type: string
       exec_start:
         description: 启动命令
@@ -122,24 +146,10 @@ definitions:
     properties:
       ServiceItem:
         $ref: '#/definitions/api.ServiceItem'
-      create_at:
-        description: 创建时间
-        type: string
-      exec_start:
-        description: 启动命令
-        type: string
-      id:
-        description: id
-        type: integer
-      instance_name:
-        description: service instance name
-        type: string
-      port:
-        description: 服务名
-        type: integer
-      version:
-        description: 版本号
-        type: string
+      instances:
+        items:
+          $ref: '#/definitions/api.Instance'
+        type: array
     type: object
   api.ServiceItem:
     properties:
@@ -166,6 +176,9 @@ definitions:
         type: integer
       user:
         description: 运行用户
+        type: string
+      version:
+        description: 版本号
         type: string
       working_dir:
         description: 工作目录
@@ -458,7 +471,7 @@ paths:
           description: no api permission or no obj permission
           schema:
             type: string
-      summary: 停止服务
+      summary: 删除服务实例
       tags:
       - Manager-Service
   /bic-cd/manager/v1/service/instances/:

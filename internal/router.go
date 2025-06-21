@@ -3,6 +3,7 @@ package internal
 import (
 	"bic-cd/internal/admin"
 	"bic-cd/internal/manager"
+	"bic-cd/internal/util"
 	"bic-cd/pkg/config"
 	"bic-cd/pkg/gen/api"
 	"bic-cd/pkg/gin_recover"
@@ -35,7 +36,7 @@ func Setup() *gin.Engine {
 	g.Use(log.MidLogger())
 	g.Use(Cors())
 	g.GET("/health", func(ctx *gin.Context) {
-		ctx.JSON(200, "success")
+		ctx.JSON(200, "success, version: "+util.GetServerTag())
 	})
 	if gin.IsDebugging() {
 		g.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

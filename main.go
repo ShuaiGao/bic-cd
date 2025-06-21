@@ -2,6 +2,7 @@ package main
 
 import (
 	"bic-cd/cmd"
+	"bic-cd/internal/util"
 )
 
 //	@title			BicCD api文档
@@ -11,6 +12,11 @@ import (
 
 //	@host	bic-cd.farmergao.cn
 
+var (
+	gitTag string
+)
+
 func main() {
+	util.SetServerTag(gitTag)
 	cmd.Execute()
 }

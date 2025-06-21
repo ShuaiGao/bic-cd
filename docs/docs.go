@@ -421,7 +421,7 @@ const docTemplate = `{
                 "tags": [
                     "Manager-Service"
                 ],
-                "summary": "停止服务",
+                "summary": "删除服务实例",
                 "parameters": [
                     {
                         "type": "integer",
@@ -706,6 +706,35 @@ const docTemplate = `{
         "api.CommonNil": {
             "type": "object"
         },
+        "api.Instance": {
+            "type": "object",
+            "properties": {
+                "create_at": {
+                    "description": "创建时间",
+                    "type": "string"
+                },
+                "exec_start": {
+                    "description": "启动命令",
+                    "type": "string"
+                },
+                "id": {
+                    "description": "id",
+                    "type": "integer"
+                },
+                "instance_name": {
+                    "description": "service instance name",
+                    "type": "string"
+                },
+                "port": {
+                    "description": "服务名",
+                    "type": "integer"
+                },
+                "version": {
+                    "description": "版本号",
+                    "type": "string"
+                }
+            }
+        },
         "api.RequestAuth": {
             "type": "object",
             "required": [
@@ -745,6 +774,10 @@ const docTemplate = `{
                 },
                 "description": {
                     "description": "服务描述",
+                    "type": "string"
+                },
+                "domain": {
+                    "description": "域名",
                     "type": "string"
                 },
                 "exec_start": {
@@ -885,29 +918,11 @@ const docTemplate = `{
                 "ServiceItem": {
                     "$ref": "#/definitions/api.ServiceItem"
                 },
-                "create_at": {
-                    "description": "创建时间",
-                    "type": "string"
-                },
-                "exec_start": {
-                    "description": "启动命令",
-                    "type": "string"
-                },
-                "id": {
-                    "description": "id",
-                    "type": "integer"
-                },
-                "instance_name": {
-                    "description": "service instance name",
-                    "type": "string"
-                },
-                "port": {
-                    "description": "服务名",
-                    "type": "integer"
-                },
-                "version": {
-                    "description": "版本号",
-                    "type": "string"
+                "instances": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/api.Instance"
+                    }
                 }
             }
         },
@@ -944,6 +959,10 @@ const docTemplate = `{
                 },
                 "user": {
                     "description": "运行用户",
+                    "type": "string"
+                },
+                "version": {
+                    "description": "版本号",
                     "type": "string"
                 },
                 "working_dir": {

@@ -9,6 +9,7 @@ import (
 
 type Service struct {
 	gorm.Model
+	Domain      string `gorm:"comment:域名"`
 	Name        string `gorm:"comment:服务名;size:128;uniqueIndex:idx_name,expression:CASE WHEN deleted_at IS NULL THEN name ELSE NULL END"`
 	Description string `gorm:"comment:服务描述"`
 	WorkingDir  string `gorm:"comment:工作目录"`
@@ -17,6 +18,12 @@ type Service struct {
 	PortMax     uint16 `gorm:"comment:最大端口号"`
 	Config      string `gorm:"comment:配置文件"`
 	Version     string `gorm:"comment:当前服务版本号"`
+	Instances   []*ServiceInstance
+}
+
+func (s *Service) GetInstanceName(inst *ServiceInstance) string {
+	v := strings.Replace(inst.Version, ".", "-", -1)
+	return fmt.Sprintf("%s-%s.service", s.Name, v)
 }
 
 func (s *Service) GetService(version string) string {
@@ -42,12 +49,14 @@ func (i *ServiceInstance) GetName() string {
 }
 
 func (i *ServiceInstance) GetService() string {
-	v := strings.Replace(i.Version, ".", "-", -1)
-	return fmt.Sprintf("%s-%s.service", i.Service.Name, v)
+	if i.Service.ID == 0 {
+		return ""
+	}
+	return i.Service.GetInstanceName(i)
 }
 
-func (i *ServiceInstance) SetExecStart(port uint16) {
+func (i *ServiceInstance) SetExecStart(version string, port uint16) {
 	i.Port = port
-	execStart := path.Join(i.Service.WorkingDir, i.Service.Name)
+	execStart := path.Join(i.Service.WorkingDir, version)
 	i.ExecStart = fmt.Sprintf("%s bic --port %d", execStart, port)
 }

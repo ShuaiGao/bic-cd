@@ -2,6 +2,7 @@ package service
 
 import (
 	"bic-cd/internal/model"
+	"bic-cd/pkg/log"
 	"bytes"
 	"fmt"
 	"net"
@@ -134,6 +135,7 @@ func RemoveService(instance model.ServiceInstance) error {
 		return err
 	}
 	servicePath := filepath.Join(systemdDir, instance.GetService())
+	log.XInfof("remove service path: %s", servicePath)
 	if err := os.RemoveAll(servicePath); err != nil {
 		return err
 	}

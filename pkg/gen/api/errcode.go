@@ -54,26 +54,28 @@ func Equal(a, b ErrCode) bool {
 }
 
 var (
-	ECSuccess               = Err{code: 0, msg: "成功"}
-	ECAuthError             = Err{code: 100001, msg: "授权登录失败"}
-	ECParamError            = Err{code: 100002, msg: "参数错误"}
-	ECServerError           = Err{code: 100003, msg: "服务端错误"}
-	ECNoSupport             = Err{code: 100004, msg: "暂不支持该功能"}
-	ECCannotOpSelf          = Err{code: 100005, msg: "不能给自己分配权限"}
-	ECDbError               = Err{code: 102000, msg: "数据库查询错误"}
-	ECDbNotfound            = Err{code: 102001, msg: "id对应数据不存在"}
-	ECDbCreateError         = Err{code: 102002, msg: "数据库创建数据错误"}
-	ECDbFindError           = Err{code: 102003, msg: "数据库查找出错"}
-	ECDbDeleteError         = Err{code: 102004, msg: "删除id对应数据不存在"}
-	ECDbTransactionError    = Err{code: 102005, msg: "数据库提交事务出错"}
-	ECDbNotfound_permission = Err{code: 102006, msg: "权限项ID不存在"}
-	ECDbSaveError           = Err{code: 102007, msg: "数据库保存数据错误"}
-	ECDbCountError          = Err{code: 102008, msg: "数据库count错误"}
-	ECDbExecError           = Err{code: 102009, msg: "sql执行错误"}
-	ECParamValidatorError   = Err{code: 102200, msg: "参数校验错误"}
-	ECRepeatedVersion       = Err{code: 102201, msg: "该服务版本已存在"}
-	ECServiceHasInstance    = Err{code: 102202, msg: "存在服务实例，不能移除服务"}
-	ECNginxConfig           = Err{code: 102203, msg: "nginx配置出错"}
-	ECNginxTest             = Err{code: 102204, msg: "nginx test 出错"}
-	ECNginxReload           = Err{code: 102205, msg: "nginx reload 出错"}
+	ECSuccess             = Err{code: 0, msg: "成功"}
+	ECAuthError           = Err{code: 100001, msg: "授权登录失败"}
+	ECParamError          = Err{code: 100002, msg: "参数错误"}
+	ECServerError         = Err{code: 100003, msg: "服务端错误"}
+	ECNoSupport           = Err{code: 100004, msg: "暂不支持该功能"}
+	ECCannotOpSelf        = Err{code: 100005, msg: "不能给自己分配权限"}
+	ECDbError             = Err{code: 102000, msg: "数据库查询错误"}
+	ECDbNotfound          = Err{code: 102001, msg: "id对应数据不存在"}
+	ECDbCreateError       = Err{code: 102002, msg: "数据库创建数据错误"}
+	ECDbFindError         = Err{code: 102003, msg: "数据库查找出错"}
+	ECDbDeleteError       = Err{code: 102004, msg: "删除id对应数据不存在"}
+	ECDbTransactionError  = Err{code: 102005, msg: "数据库提交事务出错"}
+	ECDbUpdate            = Err{code: 102006, msg: "数据库更新错误"}
+	ECDbSaveError         = Err{code: 102007, msg: "数据库保存数据错误"}
+	ECDbCountError        = Err{code: 102008, msg: "数据库count错误"}
+	ECDbExecError         = Err{code: 102009, msg: "sql执行错误"}
+	ECParamValidatorError = Err{code: 102200, msg: "参数校验错误"}
+	ECRepeatedVersion     = Err{code: 102201, msg: "该服务版本已存在"}
+	ECServiceHasInstance  = Err{code: 102202, msg: "存在服务实例，不能移除服务"}
+	ECNginxConfig         = Err{code: 102203, msg: "nginx配置出错"}
+	ECNginxTest           = Err{code: 102204, msg: "nginx test 出错"}
+	ECNginxReload         = Err{code: 102205, msg: "nginx reload 出错"}
+	ECExeFileError        = Err{code: 102206, msg: "可执行文件异常"}
+	ECInstanceRunning     = Err{code: 102207, msg: "无法移除正在运行的实例"}
 )

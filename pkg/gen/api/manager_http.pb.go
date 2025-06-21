@@ -225,7 +225,7 @@ func (x *x_ManagerService) PostServiceStart(ctx *gin.Context) {
 	})
 }
 
-// @Summary	停止服务
+// @Summary	删除服务实例
 // @Tags		Manager-Service
 // @Produce	json
 // @Param		id		path		uint		true	"some id"

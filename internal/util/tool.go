@@ -35,3 +35,12 @@ func MD5(value string) string {
 
 	return hex.EncodeToString(m.Sum(nil))
 }
+
+var tag string
+
+func GetServerTag() string {
+	return tag
+}
+func SetServerTag(sTag string) {
+	tag = sTag
+}

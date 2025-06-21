@@ -119,7 +119,7 @@ func configureNginx(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := ExecuteNginx("reload"); err != nil {
+	if err := ExecuteNginxReload(); err != nil {
 		http.Error(w, "Failed to reload nginx", http.StatusInternalServerError)
 		return
 	}
@@ -152,6 +152,16 @@ func ExecuteNginxTest(args ...string) error {
 
 func ExecuteNginx(args ...string) error {
 	cmd := exec.Command("nginx", append([]string{"-s"}, args...)...)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		log.Printf("Nginx error: %s, Output: %s", err, string(output))
+		return err
+	}
+	return nil
+}
+
+func ExecuteNginxReload(args ...string) error {
+	cmd := exec.Command("systemctl", []string{"reload", "nginx"}...)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Printf("Nginx error: %s, Output: %s", err, string(output))

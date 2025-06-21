@@ -4,6 +4,7 @@ import (
 	"bic-cd/internal/manager/nginx"
 	"bic-cd/internal/manager/service"
 	"bic-cd/internal/model"
+	"bic-cd/internal/util"
 	"bic-cd/pkg/db"
 	"bic-cd/pkg/gen/api"
 	"bic-cd/pkg/log"
@@ -11,6 +12,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"os"
+	"path"
 	"time"
 )
 
@@ -42,6 +45,7 @@ func (m Manager) GetServices(ctx *gin.Context, in *api.RequestGetService) (out *
 			PortMin:     int32(v.PortMin),
 			PortMax:     int32(v.PortMax),
 			Config:      v.Config,
+			Version:     v.Version,
 		})
 	}
 	return out, api.ECSuccess
@@ -49,6 +53,7 @@ func (m Manager) GetServices(ctx *gin.Context, in *api.RequestGetService) (out *
 
 func (m Manager) PostServices(ctx *gin.Context, in *api.RequestPostService) (out *api.ResponsePostService, code api.ErrCode) {
 	data := &model.Service{
+		Domain:      in.Domain,
 		Name:        in.Name,
 		Description: in.Description,
 		WorkingDir:  in.WorkingDir,
@@ -95,13 +100,25 @@ func (m Manager) PostServiceDeploy(ctx *gin.Context, in *api.RequestPostServiceD
 		code = api.ECDbFindError.Wrap(err)
 		return
 	}
-	port, err := service.GetAvailablePort(1024, 2048)
+	exePath := path.Join(data.WorkingDir, in.Version)
+	if _, err := os.Stat(exePath); err != nil {
+		code = api.ECExeFileError.Wrap(err)
+		return
+	}
+	var minPort uint16
+	if err := db.DB().Model(&model.ServiceInstance{}).
+		Select("max(port) as port").
+		Pluck("port", &minPort).Error; err != nil {
+		code = api.ECDbFindError.Wrap(err)
+		return
+	}
+	port, err := service.GetAvailablePort(minPort, 2048)
 	if err != nil {
 		code = api.ECServerError.Wrap(err)
 		return
 	}
 	instance := model.ServiceInstance{ServiceID: data.ID, Service: data, Version: in.Version}
-	instance.SetExecStart(port)
+	instance.SetExecStart(in.Version, port)
 	if err = service.BuildService(service.Config{Instance: instance}); err != nil {
 		code = api.ECServerError
 		return
@@ -110,6 +127,7 @@ func (m Manager) PostServiceDeploy(ctx *gin.Context, in *api.RequestPostServiceD
 		code = api.ECDbCreateError.Wrap(err)
 		return
 	}
+	// TODO test status
 	out = &api.ResponsePostServiceDeploy{
 		Id: uint32(id),
 	}
@@ -177,10 +195,10 @@ func (m Manager) PostServiceStatus(ctx *gin.Context, id uint) (out *api.Response
 
 func (m Manager) GetServiceInstances(ctx *gin.Context, in *api.RequestGetServiceInstance) (out *api.ResponseGetServiceInstance, code api.ErrCode) {
 	code = api.ECSuccess
-	var data []*model.ServiceInstance
+	var data []*model.Service
 	var total int64
-	if err := db.DB().Model(&model.ServiceInstance{}).Debug().
-		Preload("Service").
+	if err := db.DB().Model(&model.Service{}).
+		Preload("Instances").
 		Count(&total).
 		Offset(int((in.Page - 1) * in.PageSize)).
 		Limit(int(in.PageSize)).
@@ -193,25 +211,48 @@ func (m Manager) GetServiceInstances(ctx *gin.Context, in *api.RequestGetService
 		PageSize: in.PageSize,
 		Total:    uint32(total),
 	}
+	versionMap := make(map[string]bool)
 	for _, v := range data {
-		out.Items = append(out.Items, &api.ServiceInstanceItem{
-			ServiceItem: &api.ServiceItem{
-				Id:          uint32(v.Service.ID),
-				Name:        v.Service.Name,
-				Description: v.Service.Description,
-				WorkingDir:  v.Service.WorkingDir,
-				User:        v.Service.User,
-				PortMin:     int32(v.Service.PortMin),
-				PortMax:     int32(v.Service.PortMax),
-				Config:      v.Service.Config,
-			},
-			Id:           uint32(v.ID),
-			Port:         uint32(v.Port),
-			ExecStart:    v.ExecStart,
-			Version:      v.Version,
-			CreateAt:     v.CreatedAt.Format(time.DateTime),
-			InstanceName: v.GetService(),
-		})
+		ServiceItem := &api.ServiceItem{
+			Id:          uint32(v.ID),
+			Name:        v.Name,
+			Description: v.Description,
+			WorkingDir:  v.WorkingDir,
+			User:        v.User,
+			PortMin:     int32(v.PortMin),
+			PortMax:     int32(v.PortMax),
+			Config:      v.Config,
+			Version:     v.Version,
+		}
+		var instances []*api.Instance
+		for _, inst := range v.Instances {
+			versionMap[inst.Version] = true
+			instances = append(instances, &api.Instance{
+				Id:           uint32(inst.ID),
+				Port:         uint32(inst.Port),
+				ExecStart:    inst.ExecStart,
+				Version:      inst.Version,
+				CreateAt:     inst.CreatedAt.Format(time.DateTime),
+				InstanceName: v.GetInstanceName(inst),
+			})
+		}
+		if entries, err := os.ReadDir(v.WorkingDir); err == nil {
+			for _, entry := range entries {
+				if entry.IsDir() {
+					continue
+				}
+				if !util.IsValidTag(entry.Name()) {
+					continue
+				}
+				if _, ok := versionMap[entry.Name()]; ok {
+					continue
+				}
+				instances = append(instances, &api.Instance{
+					Version: entry.Name(),
+				})
+			}
+		}
+		out.Items = append(out.Items, &api.ServiceInstanceItem{ServiceItem: ServiceItem, Instances: instances})
 	}
 	return
 }
@@ -227,8 +268,12 @@ func (m Manager) DeleteServiceInstance(ctx *gin.Context, id uint) (out *api.Comm
 		code = api.ECDbFindError.Wrap(err)
 		return
 	}
+	if data.Service.Version == data.Version {
+		code = api.ECInstanceRunning.Wrap(data.Version)
+		return
+	}
 	if err := service.RemoveService(data); err != nil {
-		code = api.ECServerError
+		code = api.ECServerError.Wrap(err)
 		return
 	}
 	if err := db.DB().Delete(&data).Error; err != nil {
@@ -253,7 +298,7 @@ func (m Manager) PostServiceVersion(ctx *gin.Context, in *api.RequestPostService
 	}
 	log.XInfo("nginx 3333")
 	config := nginx.NginxConfig{
-		Domain: data.Service.Name,
+		Domain: data.Service.Domain,
 		Port:   data.Port,
 	}
 	log.XInfo("nginx 4444")
@@ -266,8 +311,12 @@ func (m Manager) PostServiceVersion(ctx *gin.Context, in *api.RequestPostService
 		code = api.ECNginxTest.Wrap(err)
 		return
 	}
+	if err := db.DB().Model(&model.Service{}).Where("id = ?", data.ServiceID).Update("version", in.Version).Error; err != nil {
+		code = api.ECDbUpdate.Wrap(err)
+		return
+	}
 	log.XInfo("nginx 6666")
-	if err := nginx.ExecuteNginx(); err != nil {
+	if err := nginx.ExecuteNginxReload(); err != nil {
 		code = api.ECNginxReload.Wrap(err)
 		return
 	}

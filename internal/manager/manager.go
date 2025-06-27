@@ -51,6 +51,24 @@ func (m Manager) GetServices(ctx *gin.Context, in *api.RequestGetService) (out *
 	return out, api.ECSuccess
 }
 
+func (m Manager) PatchServices(ctx *gin.Context, in *api.RequestPatchService, id uint) (out *api.CommonNil, code api.ErrCode) {
+	var s model.Service
+	if err := db.DB().Model(&model.Service{}).First(&s, id).Error; err != nil {
+		return nil, api.ECDbFindError.Wrap(err)
+	}
+	if in.Name != "" {
+		s.Name = in.Name
+	}
+	if in.Domain != "" {
+		s.Domain = in.Domain
+	}
+	if err := db.DB().Save(&s).Error; err != nil {
+		code = api.ECDbCreateError.Wrap(err)
+		return
+	}
+	return out, api.ECSuccess
+}
+
 func (m Manager) PostServices(ctx *gin.Context, in *api.RequestPostService) (out *api.ResponsePostService, code api.ErrCode) {
 	data := &model.Service{
 		Domain:      in.Domain,
@@ -287,7 +305,8 @@ func (m Manager) PostServiceVersion(ctx *gin.Context, in *api.RequestPostService
 	code = api.ECSuccess
 	var data model.ServiceInstance
 	log.XInfo("nginx ", id)
-	if err := db.DB().Preload("Service").First(&data, id).Error; err != nil {
+	if err := db.DB().Preload("Service").Where("service_id = ?", id).Where("version = ?", in.Version).
+		First(&data).Error; err != nil {
 		code = api.ECDbFindError.Wrap(err)
 		return
 	}

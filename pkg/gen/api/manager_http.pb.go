@@ -18,6 +18,7 @@ var ManagerServiceValidate = validator.New()
 func RegisterManagerServiceHttpHandler(g *gin.RouterGroup, srvs ManagerService) {
 	tmp := &x_ManagerService{xx: srvs}
 	g.GET("/bic-cd/manager/v1/services/", tmp.GetServices)
+	g.PATCH("/bic-cd/manager/v1/service/:id/", tmp.PatchServices)
 	g.POST("/bic-cd/manager/v1/services/", tmp.PostServices)
 	g.DELETE("/bic-cd/manager/v1/service/:id/", tmp.DeleteServices)
 	g.POST("/bic-cd/manager/v1/service/:id/deploy", tmp.PostServiceDeploy)
@@ -31,6 +32,7 @@ func RegisterManagerServiceHttpHandler(g *gin.RouterGroup, srvs ManagerService) 
 
 type ManagerService interface {
 	GetServices(ctx *gin.Context, in *RequestGetService) (out *ResponseGetService, code ErrCode)
+	PatchServices(ctx *gin.Context, in *RequestPatchService, id uint) (out *CommonNil, code ErrCode)
 	PostServices(ctx *gin.Context, in *RequestPostService) (out *ResponsePostService, code ErrCode)
 	DeleteServices(ctx *gin.Context, id uint) (out *CommonNil, code ErrCode)
 	PostServiceDeploy(ctx *gin.Context, in *RequestPostServiceDeploy, id uint) (out *ResponsePostServiceDeploy, code ErrCode)
@@ -45,6 +47,7 @@ type ManagerService interface {
 // generated http handle
 type ManagerServiceHttpHandler interface {
 	GetServices(ctx *gin.Context)
+	PatchServices(ctx *gin.Context)
 	PostServices(ctx *gin.Context)
 	DeleteServices(ctx *gin.Context)
 	PostServiceDeploy(ctx *gin.Context)
@@ -87,6 +90,49 @@ func (x *x_ManagerService) GetServices(ctx *gin.Context) {
 		return
 	}
 	rsp, errCode := x.xx.GetServices(ctx, req)
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":   errCode.Code(),
+		"detail": errCode.String(),
+		"data":   rsp,
+	})
+}
+
+// @Summary	修改服务
+// @Tags		Manager-Service
+// @Produce	json
+// @Param		id		path		uint				true	"some id"
+// @Param		data	body		RequestPatchService	true	"body 参数"
+// @Success	200		{object}	gen.Response{data=CommonNil}
+// @Failure	401		{string}	string	"header need Authorization data"
+// @Failure	403		{string}	string	"no api permission or no obj permission"
+// @Router		/bic-cd/manager/v1/service/:id/ [PATCH]
+func (x *x_ManagerService) PatchServices(ctx *gin.Context) {
+	req := &RequestPatchService{}
+	if err := ctx.ShouldBindJSON(req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"code": 400, "detail": "request error"})
+		return
+	}
+	if err := ManagerServiceValidate.Struct(req); err != nil {
+		msg := "request param validator error"
+		if gin.Mode() == gin.DebugMode {
+			msg = msg + " | " + err.Error()
+		}
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":   400,
+			"detail": msg,
+		})
+		return
+	}
+	id, err := strconv.Atoi(ctx.Param("id"))
+	if err != nil || id < 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":   400,
+			"detail": "param id should be int",
+		})
+		return
+	}
+	rsp, errCode := x.xx.PatchServices(ctx, req, uint(id))
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"code":   errCode.Code(),

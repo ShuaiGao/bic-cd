@@ -168,6 +168,65 @@
                         }
                     }
                 }
+            },
+            "patch": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Manager-Service"
+                ],
+                "summary": "修改服务",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "some id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "body 参数",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.RequestPatchService"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/gen.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/api.CommonNil"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "401": {
+                        "description": "header need Authorization data",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "403": {
+                        "description": "no api permission or no obj permission",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
             }
         },
         "/bic-cd/manager/v1/service/:id/deploy": {
@@ -740,6 +799,19 @@
                 },
                 "username": {
                     "description": "@gotags: validate:\"required\"",
+                    "type": "string"
+                }
+            }
+        },
+        "api.RequestPatchService": {
+            "type": "object",
+            "properties": {
+                "domain": {
+                    "description": "域名",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "服务名",
                     "type": "string"
                 }
             }

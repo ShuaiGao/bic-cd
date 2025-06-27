@@ -34,6 +34,15 @@ definitions:
     - password
     - username
     type: object
+  api.RequestPatchService:
+    properties:
+      domain:
+        description: 域名
+        type: string
+      name:
+        description: 服务名
+        type: string
+    type: object
   api.RequestPostAdmin:
     properties:
       password:
@@ -293,6 +302,42 @@ paths:
           schema:
             type: string
       summary: 删除服务
+      tags:
+      - Manager-Service
+    patch:
+      parameters:
+      - description: some id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: body 参数
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/api.RequestPatchService'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/gen.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/api.CommonNil'
+              type: object
+        "401":
+          description: header need Authorization data
+          schema:
+            type: string
+        "403":
+          description: no api permission or no obj permission
+          schema:
+            type: string
+      summary: 修改服务
       tags:
       - Manager-Service
   /bic-cd/manager/v1/service/:id/deploy:

@@ -40,6 +40,11 @@ message RequestPostService{
   string domain = 9; // 域名
 }
 
+message RequestPatchService{
+  string name = 1; // 服务名
+  string domain = 9; // 域名
+}
+
 message ResponsePostService{
   uint32 id = 1;
 }
@@ -91,6 +96,8 @@ message RequestPostServiceVersion{
 service manager_service{
   // @Summary: 获取服务列表 @url:/bic-cd/manager/v1/services/
   rpc GetServices(RequestGetService) returns (ResponseGetService);
+  // @Summary: 修改服务 @url:/bic-cd/manager/v1/service/<uint:id>/
+  rpc PatchServices(RequestPatchService) returns (http.CommonNil);
   // @Summary: 添加服务 @url:/bic-cd/manager/v1/services/
   rpc PostServices(RequestPostService) returns (ResponsePostService);
   // @Summary: 删除服务 @url:/bic-cd/manager/v1/service/<uint:id>/

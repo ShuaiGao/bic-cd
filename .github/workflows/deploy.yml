@@ -1,0 +1,51 @@
+name: Go
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23'
+
+      - name: vet check
+        run: |
+          go env -w GO111MODULE=on
+          go mod tidy
+
+      - name: build
+        run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-X 'main.gitTag=${{ github.ref_name }}'" -o bic-cd main.go
+
+      - name: copy file
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          key: ${{ secrets.KEY }}
+          source: bic-cd
+          target: /root/bic-cd/
+
+      - name: restart
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          key: ${{ secrets.KEY }}
+          username: ${{ secrets.USERNAME }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          script: |
+            chmod u+x ~/bic-cd
+            sudo systemctl restart bic-cd
+
+      - name: ding talk
+        run: |
+          curl 'https://oapi.dingtalk.com/robot/send?access_token=ca462bb72e4f00293e81c684f1ea8483f67b6c89a9e5e3c004264bd5ac6bf665' -H 'Content-Type: application/json' -d '{"msgtype": "text","text": {"content":"【bic-cd】-server 发布完成，${{ github.ref_name }}"}}'

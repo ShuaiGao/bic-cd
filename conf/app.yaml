@@ -1,6 +1,0 @@
-app:
-  jwt_secret: "aabb"
-  log_path: "run/logs/bic-cd.log"
-  sqlite_path: "run/db/bic-cd.db"
-  run_mode: "debug"
-  workspace_path: "/home/dongua/workspace/deploy"

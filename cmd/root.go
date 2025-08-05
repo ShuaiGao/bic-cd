@@ -52,7 +52,7 @@ var (
 
 func init() {
 	bicCmd.Flags().Uint16P("port", "p", 6996, "bic server port")
-	bicCmd.Flags().StringP("conf", "c", "./conf/app.yaml", "bic server config")
+	bicCmd.Flags().StringP("conf", "c", "./configs/app.yaml", "bic server config")
 }
 
 func stop() {

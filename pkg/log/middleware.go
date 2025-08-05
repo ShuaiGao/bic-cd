@@ -27,12 +27,13 @@ func debug() gin.HandlerFunc {
 		c.Set(TraceKey, traceID)
 		c.Set(TraceTimestamp, now.UnixMilli())
 		c.Header(TraceKey, traceID)
-		if "/health" != c.Request.URL.Path {
+		path := c.Request.URL.Path
+		if "/health" != path {
 			infof(
 				[]zapcore.Field{
 					{Key: "client_ip", Type: zapcore.StringType, String: c.ClientIP()},
 					{Key: "method", Type: zapcore.StringType, String: c.Request.Method},
-					{Key: "url", Type: zapcore.StringerType, String: c.Request.URL.Path},
+					{Key: "url", Type: zapcore.StringerType, String: path},
 					{Key: TraceKey, Type: zapcore.StringType, String: traceID},
 				},
 				">> recv: body[ %s ] query[ %s ] size[%d]",
@@ -42,12 +43,12 @@ func debug() gin.HandlerFunc {
 		}
 		c.Next()
 		userId := c.GetUint(util.UserID)
-		if "/health" != c.Request.URL.Path {
+		if "/health" != path {
 			infof(
 				[]zapcore.Field{
 					{Key: "client_ip", Type: zapcore.StringType, String: c.ClientIP()},
 					{Key: "method", Type: zapcore.StringType, String: c.Request.Method},
-					{Key: "url", Type: zapcore.StringerType, String: c.Request.URL.Path},
+					{Key: "url", Type: zapcore.StringType, String: path},
 					{Key: "user_id", Type: zapcore.Uint32Type, Integer: int64(userId)},
 					{Key: TraceKey, Type: zapcore.StringType, String: traceID},
 					{Key: "duration", Type: zapcore.Uint32Type, Integer: time.Since(now).Milliseconds()},

@@ -67,7 +67,7 @@ func newZapLogger(console *consoleConfig, json *jsonConfig) *zapLogger {
 		cores = append(cores, core)
 	}
 	combinedCore := zapcore.NewTee(cores...)
-	opts := []zap.Option{zap.AddStacktrace(zapcore.ErrorLevel), zap.AddCaller(), zap.AddCallerSkip(2)}
+	opts := []zap.Option{zap.AddStacktrace(zapcore.ErrorLevel), zap.AddCaller(), zap.AddCallerSkip(1)}
 	l.logger = zap.New(combinedCore, opts...)
 	l.sugaredLogger = l.logger.Sugar()
 	return l

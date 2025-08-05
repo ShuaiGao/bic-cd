@@ -2,12 +2,13 @@ package db
 
 import (
 	"bic-cd/pkg/config"
+	"bic-cd/pkg/log"
 	"context"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 var db *gorm.DB
@@ -32,7 +33,7 @@ func Setup() {
 	}
 	var err error
 	db, err = gorm.Open(sqlite.Open(sqlitePath), &gorm.Config{
-		Logger:          logger.Default.LogMode(logger.Info),
+		Logger:          log.ExportGormLogger(time.Second*3, 100*1000),
 		CreateBatchSize: 100,
 	})
 	if err != nil {

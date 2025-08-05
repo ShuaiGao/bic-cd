@@ -33,7 +33,7 @@ func debug() gin.HandlerFunc {
 				[]zapcore.Field{
 					{Key: "client_ip", Type: zapcore.StringType, String: c.ClientIP()},
 					{Key: "method", Type: zapcore.StringType, String: c.Request.Method},
-					{Key: "url", Type: zapcore.StringerType, String: path},
+					{Key: "url", Type: zapcore.StringType, String: path},
 					{Key: TraceKey, Type: zapcore.StringType, String: traceID},
 				},
 				">> recv: body[ %s ] query[ %s ] size[%d]",

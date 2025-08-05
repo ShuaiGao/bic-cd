@@ -35,7 +35,7 @@ var (
 func gorminit() {
 	_, file, _, _ := runtime.Caller(0)
 	// compatible solution to get gorm source directory with various operating systems
-	gormSourceDir = regexp.MustCompile(`utils.utils\.go`).ReplaceAllString(file, "")
+	gormSourceDir = regexp.MustCompile(`gorm\.go`).ReplaceAllString(file, "")
 }
 
 // ExportGormLogger must after glog init
@@ -128,7 +128,7 @@ func (gl *gormLogger) cutoff(sql string) string {
 // fileWithLineNum return the file name and line number of the current file
 func fileWithLineNum() string {
 	// the second caller usually from glog & gorm internal, so set i start from 4
-	for i := 4; i < 15; i++ {
+	for i := 3; i < 15; i++ {
 		_, file, line, ok := runtime.Caller(i)
 		if ok && (!strings.HasPrefix(file, gormSourceDir) || strings.HasSuffix(file, "_test.go")) {
 			return file + ":" + strconv.FormatInt(int64(line), 10)
